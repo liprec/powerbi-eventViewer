@@ -3,8 +3,12 @@
     "scripts": {
         "pbiviz": "pbiviz",
         "start": "pbiviz start",
+        "prepackage": "npm install",
         "package": "pbiviz package --resources",
-        "lint": "node node_modules/tslint/bin/tslint \"+(src|test)/**/*.ts\""
+        "pretest": "npm install && pbiviz package --resources --no-minify --no-pbiviz --no-plugin",
+        "test:lint": "tslint -c tslint.json -p tsconfig.json",
+        "test:unit": "karma start",
+        "test": "npm run test:lint && npm run test:unit"
     },
     "dependencies": {
         "core-js": "^3.6.5",
