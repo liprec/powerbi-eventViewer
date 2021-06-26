@@ -1,0 +1,59 @@
+name: Build and test
+
+on:
+  push:
+    branches: [main, certification]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    name: buid, package and release
+    runs-on: ubuntu-latest
+    if: ${{ endsWith(github.ref, 'certification') }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: use Node.js 12
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - name: npm run package
+        run: |
+          npm run package
+        env:
+          CI: true
+      - name: extract package.json version
+        id: extract_version
+        run: |
+          node -e "const v = require('./pbiviz.json').visual.version;console.log('::set-output name=version::' + v);"
+      - name: rename pbiviz file
+        run: |
+          cp $oldfile $newfile
+        env:
+          oldfile: ./dist/eventViewer0D4E4EFE0AEC4A0A9CB3C14B04685C64.${{ steps.extract_version.outputs.version }}.pbiviz
+          newfile: ./dist/EventViewer-${{ steps.extract_version.outputs.version }}.pbiviz
+      - name: release to github
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.extract_version.outputs.version }}
+          release_name: Version ${{ steps.extract_version.outputs.version }}
+          draft: true
+          prerelease: true
+          body: |
+            # Power BI EventViewer
+            Visualize device events in the time
+
+            ## Availability
+            The final version is available at AppSource:
+      - name: upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist/EventViewer-${{ steps.extract_version.outputs.version }}.pbiviz
+          asset_name: EventViewer-${{ steps.extract_version.outputs.version }}.pbiviz
+          asset_content_type: application/zip
