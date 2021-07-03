@@ -66,6 +66,12 @@ export enum LegendPosition {
     BottomRight,
 }
 
+export enum TimePrecision {
+    Second = 1,
+    Minute = 60,
+    Hour = 3600,
+}
+
 export enum TraceEvents {
     constructor = "EventViewer: Constructor",
     convertor = "EventViewer: Convertor method",

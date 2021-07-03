@@ -47,6 +47,7 @@ export interface EventDataPoints {
 }
 
 export interface Device {
+    key: number;
     name: string;
     states: State[];
     selectionId: ISelectionId;
@@ -62,7 +63,9 @@ export interface State {
     selectionId?: ISelectionId;
     deviceSelectionId?: ISelectionId;
     state?: PrimitiveValue | null;
+    isHighlight: boolean;
     time: Date;
+    startTime: Date;
     tooltip?: () => VisualTooltipDataItem[];
 }
 
@@ -74,6 +77,7 @@ export interface DataPoint {
 }
 
 export interface Legend {
+    index: number;
     legend: string;
     color: string;
 }

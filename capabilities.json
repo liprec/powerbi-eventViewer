@@ -246,6 +246,31 @@
         "timeAxis": {
             "displayName": "Time axis",
             "properties": {
+                "leadTime": {
+                    "displayName": "Lead time",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "leadTimePrecision": {
+                    "displayName": "Lead time precision",
+                    "type": {
+                        "enumeration": [
+                            {
+                                "displayName": "Second(s)",
+                                "value": "1"
+                            },
+                            {
+                                "displayName": "Minute(s)",
+                                "value": "60"
+                            },
+                            {
+                                "displayName": "Hour(s)",
+                                "value": "3600"
+                            }
+                        ]
+                    }
+                },
                 "fontColor": {
                     "displayName": "Label color",
                     "type": {

@@ -44,6 +44,16 @@ export function calculateData(data: EventDataPoints, settings: Settings): EventD
                 } as DataPoint;
             }
         });
+        device.key = device.states
+            .map(
+                (state, index) =>
+                    <number>state.dataPoint?.x1 +
+                    <number>state.dataPoint?.x2 +
+                    <number>state.dataPoint?.y1 +
+                    <number>state.dataPoint?.y2 +
+                    (state.isHighlight ? index + 1 : 0)
+            )
+            .reduce((a, b) => a + b);
     });
     return data;
 }

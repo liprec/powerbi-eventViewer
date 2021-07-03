@@ -29,14 +29,10 @@
 import powerbi from "powerbi-visuals-api";
 import { Selection } from "d3-selection";
 
-import ISelectionId = powerbi.visuals.ISelectionId;
-import ISelectionManager = powerbi.extensibility.ISelectionManager;
-
 import { DataPoint, Device, EventDataPoints, State } from "./data";
 import { drawState, getStateColor } from "./drawState";
 import { Selectors } from "./selectors";
 import { Settings } from "./settings";
-import { syncSelectionState } from "./syncSelectionState";
 
 export function drawPlot(
     selection: Selection<any, any, any, any>,
@@ -46,10 +42,7 @@ export function drawPlot(
 ): void {
     selection
         .selectAll(Selectors.Device.selectorName)
-        .data(
-            data.devices,
-            (device: Device) => (device.states[0].dataPoint?.x2 as number) + (device.states[0].dataPoint?.y2 as number)
-        )
+        .data(data.devices, (device: Device) => device.key)
         .join(
             enter => enter.append("g").classed(Selectors.Device.className, true),
             update => update.select(Selectors.Device.selectorName),
@@ -63,12 +56,14 @@ export function drawPlot(
                     .append("path")
                     .classed(Selectors.State.className, true)
                     .attr("d", (state: State) => drawState(state.dataPoint as DataPoint))
-                    .attr("fill", (state: State) => getStateColor(state)),
+                    .attr("fill", (state: State) => getStateColor(state))
+                    .style("opacity", (state: State) => (state.isHighlight ? 1 : 0.3)),
             update =>
                 update
                     .select(Selectors.State.selectorName)
                     .attr("d", (state: State) => drawState(state.dataPoint as DataPoint))
-                    .attr("fill", (state: State) => getStateColor(state)),
+                    .attr("fill", (state: State) => getStateColor(state))
+                    .style("opacity", (state: State) => (state.isHighlight ? 1 : 0.3)),
             exit => exit.remove()
         )
         .on("click", clickEvent);

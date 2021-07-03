@@ -31,7 +31,7 @@ import powerbi from "powerbi-visuals-api";
 import { dataViewObjectsParser } from "powerbi-visuals-utils-dataviewutils";
 import { interfaces } from "powerbi-visuals-utils-formattingutils";
 import { AxisDimensions, LegendDimensions, PlotDimensions, Scales } from "./data";
-import { FontStyle, FontWeight, LegendPosition } from "./enums";
+import { FontStyle, FontWeight, LegendPosition, TimePrecision } from "./enums";
 
 import DataView = powerbi.DataView;
 import DataViewObjectsParser = dataViewObjectsParser.DataViewObjectsParser;
@@ -72,7 +72,9 @@ class GeneralSettings {
     }
 }
 
-class TextSettings {
+class LegendSettings {
+    public show: boolean = true;
+    public position: LegendPosition = LegendPosition.TopLeft;
     public fontColor: string = "#666666";
     public fontSize: number = 11;
     public fontFamily: string = fontFamily;
@@ -100,14 +102,65 @@ class TextSettings {
     }
 }
 
-class LegendSettings extends TextSettings {
-    public show: boolean = true;
-    public position: LegendPosition = LegendPosition.TopLeft;
+class DeviceAxis {
+    // Default text settings
+    public fontColor: string = "#666666";
+    public fontSize: number = 11;
+    public fontFamily: string = fontFamily;
+    public fontStyle: number = FontStyle.Normal;
+    public fontWeight: number = FontWeight.Normal;
+    public get FontStyle(): string {
+        switch (this.fontStyle) {
+            default:
+            case FontStyle.Normal:
+                return "Normal";
+            case FontStyle.Italic:
+                return "Italic";
+        }
+    }
+    public get FontSize(): string {
+        return `${this.fontSize}pt`;
+    }
+    public get TextProperties(): TextProperties {
+        return {
+            fontFamily: this.fontFamily,
+            fontSize: this.FontSize,
+            fontStyle: this.FontStyle,
+            fontWeight: this.fontWeight.toString(),
+        };
+    }
 }
 
-class DeviceAxis extends TextSettings {}
-
-class TimeAxis extends TextSettings {}
+class TimeAxis {
+    leadTime: number | null = null;
+    leadTimePrecision: number = TimePrecision.Second;
+    // Default text settings
+    public fontColor: string = "#666666";
+    public fontSize: number = 11;
+    public fontFamily: string = fontFamily;
+    public fontStyle: number = FontStyle.Normal;
+    public fontWeight: number = FontWeight.Normal;
+    public get FontStyle(): string {
+        switch (this.fontStyle) {
+            default:
+            case FontStyle.Normal:
+                return "Normal";
+            case FontStyle.Italic:
+                return "Italic";
+        }
+    }
+    public get FontSize(): string {
+        return `${this.fontSize}pt`;
+    }
+    public get TextProperties(): TextProperties {
+        return {
+            fontFamily: this.fontFamily,
+            fontSize: this.FontSize,
+            fontStyle: this.FontStyle,
+            fontWeight: this.fontWeight.toString(),
+        };
+    }
+}
 
 class StateColorSettings {
     public fill: string = "#EEEEEE";
