@@ -29,27 +29,21 @@
 import powerbi from "powerbi-visuals-api";
 
 import DataView = powerbi.DataView;
-import DataViewCategoryColumn = powerbi.DataViewCategoryColumn;
 import DataViewHierarchyLevel = powerbi.DataViewHierarchyLevel;
 import DataViewMatrixNode = powerbi.DataViewMatrixNode;
 import DataViewMetadataColumn = powerbi.DataViewMetadataColumn;
-import DataViewTableRow = powerbi.DataViewTableRow;
-import DataViewValueColumn = powerbi.DataViewValueColumn;
 import ISandboxExtendedColorPalette = powerbi.extensibility.ISandboxExtendedColorPalette;
-import ISelectionIdBuilder = powerbi.visuals.ISelectionIdBuilder;
 import IViewPort = powerbi.IViewport;
 import IVisualHost = powerbi.extensibility.visual.IVisualHost;
-import PrimitiveValue = powerbi.PrimitiveValue;
 import VisualTooltipDataItem = powerbi.extensibility.VisualTooltipDataItem;
 
 import { getObject } from "powerbi-visuals-utils-dataviewutils/lib/dataViewObjects";
-import { LineStyle, DiagramAlignment, TraceEvents } from "./enums";
+import { TraceEvents } from "./enums";
 import { PerfTimer } from "./perfTimer";
 import { valueFormatter } from "powerbi-visuals-utils-formattingutils";
-import { chain, head, times } from "lodash";
-import { parseSettings, Settings } from "./settings";
-import { DataPoint, Device, State, EventDataPoints, Legend } from "./data";
-import { scaleTime, max, min, scaleBand } from "d3";
+import { parseSettings } from "./settings";
+import { Device, State, EventDataPoints, Legend } from "./data";
+import { max, min } from "d3";
 
 const devicesRole = "device";
 const timeRole = "time";
@@ -92,6 +86,7 @@ export function converter(
     let index = 0;
     if (settings.unknown.show) {
         legend.push({
+            index: 0,
             legend: settings.unknown.label,
             color: settings.unknown.color,
         });
@@ -102,6 +97,7 @@ export function converter(
             .withMatrixNode(row, rowLevels)
             .createSelectionId();
         const device: Device = {
+            key: -1,
             name: row.value,
             states: [],
             selectionId: deviceSelectionId,
@@ -111,18 +107,19 @@ export function converter(
                 const time = new Date(measure.value as string);
                 if (!timeSeries.some((t: Date) => t === time)) timeSeries.push(time);
                 const state = measure.values && measure.values[0].value;
+                const isHighlight = measure.values && measure.values[0].highlight !== null;
                 if (!legend.some((s: Legend) => s.legend === state)) {
                     legend.push({
+                        index: legend.length,
                         legend: state?.toString() as string,
                         color: getColorByIndex(
-                            index,
-                            index.toString(),
+                            legend.length,
+                            legend.length.toString(),
                             dataView?.metadata.objects,
                             "stateColor",
                             colors
                         ),
                     });
-                    index++;
                 }
                 const selectionId = host
                     .createSelectionIdBuilder()
@@ -137,7 +134,9 @@ export function converter(
                     selectionId,
                     deviceSelectionId,
                     state,
+                    isHighlight,
                     time,
+                    startTime: time,
                     tooltip: getTooltip,
                 } as State;
             });
@@ -145,8 +144,12 @@ export function converter(
         return device;
     });
 
+    const sTime = new Date(JSON.parse(JSON.stringify(min(timeSeries) as Date)));
+    if (settings.timeAxis.leadTime !== null)
+        sTime.setSeconds(sTime.getSeconds() + settings.timeAxis.leadTime * settings.timeAxis.leadTimePrecision);
+
     devices.forEach((device: Device) => {
-        if (settings.unknown.show && device.states[0].time !== min(timeSeries)) {
+        if (settings.unknown.show && device.states[0].time > sTime) {
             device.states = [
                 {
                     color: settings.unknown.color,
@@ -155,7 +158,9 @@ export function converter(
                     name: device.name,
                     selectionId: undefined,
                     state: settings.unknown.label,
-                    time: min(timeSeries) as Date,
+                    isHighlight: false,
+                    time: sTime,
+                    startTime: min(timeSeries) as Date,
                     tooltip: getTooltip,
                 } as State,
             ].concat(device.states);
@@ -164,7 +169,9 @@ export function converter(
         device.states.forEach((state: State, index: number, all: State[]) => {
             if (index < nrOfEvents - 1) state.endTime = all[index + 1].time;
             else state.endTime = max(timeSeries);
+            if (state.time < sTime) state.time = sTime;
         });
+        device.states = device.states.filter((state: State) => (state.endTime as Date) > sTime);
     });
 
     settings.general.width = viewPort.width - 2 * settings.general.padding;
@@ -173,9 +180,9 @@ export function converter(
     timer();
     return {
         devices,
-        times: [min(timeSeries) as Date, max(timeSeries) as Date],
+        times: [sTime, max(timeSeries) as Date],
         timeFormatter,
-        legend,
+        legend: legend.sort((l1, l2) => l1.index - l2.index),
         settings,
     };
 }
@@ -228,7 +235,7 @@ function getTooltip(this: State): VisualTooltipDataItem[] {
             displayName: "Start time",
             color: this.color,
             opacity: "0",
-            value: this.formatter.format(this.time),
+            value: this.formatter.format(this.startTime),
         },
         {
             header: "",

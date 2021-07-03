@@ -31,16 +31,11 @@ import "regenerator-runtime/runtime";
 import "./../style/visual.less";
 
 import powerbi from "powerbi-visuals-api";
-import {
-    ITooltipServiceWrapper,
-    createTooltipServiceWrapper,
-    TooltipEventArgs,
-} from "powerbi-visuals-utils-tooltiputils";
-import { select, Selection, selectAll } from "d3-selection";
+import { ITooltipServiceWrapper, createTooltipServiceWrapper } from "powerbi-visuals-utils-tooltiputils";
+import { select, Selection } from "d3-selection";
 import { isEqual } from "lodash";
 
 import DataView = powerbi.DataView;
-import DataViewPropertyValue = powerbi.DataViewPropertyValue;
 import EnumerateVisualObjectInstancesOptions = powerbi.EnumerateVisualObjectInstancesOptions;
 import ISandboxExtendedColorPalette = powerbi.extensibility.ISandboxExtendedColorPalette;
 import ISelectionId = powerbi.visuals.ISelectionId;
@@ -48,23 +43,18 @@ import ISelectionManager = powerbi.extensibility.ISelectionManager;
 import IViewPort = powerbi.IViewport;
 import IVisual = powerbi.extensibility.visual.IVisual;
 import IVisualHost = powerbi.extensibility.visual.IVisualHost;
-import Selector = powerbi.data.Selector;
 import VisualConstructorOptions = powerbi.extensibility.visual.VisualConstructorOptions;
 import VisualObjectInstance = powerbi.VisualObjectInstance;
 import VisualObjectInstanceEnumeration = powerbi.VisualObjectInstanceEnumeration;
 import VisualObjectInstanceEnumerationObject = powerbi.VisualObjectInstanceEnumerationObject;
-import VisualObjectInstancesToPersist = powerbi.VisualObjectInstancesToPersist;
-import VisualTooltipDataItem = powerbi.extensibility.VisualTooltipDataItem;
 import VisualUpdateOptions = powerbi.extensibility.visual.VisualUpdateOptions;
-import VisualUpdateType = powerbi.VisualUpdateType;
 
-import { parseSettings, Settings } from "./settings";
+import { Settings } from "./settings";
 import { converter } from "./converter";
 import { syncSelectionState } from "./syncSelectionState";
 import { PerfTimer } from "./perfTimer";
 import { TraceEvents } from "./enums";
-import { DataPoint, Device, EventDataPoints, Legend, State } from "./data";
-import { drawState, getStateColor } from "./drawState";
+import { Device, EventDataPoints, Legend, State } from "./data";
 import { calculatePlot } from "./calculatePlot";
 import { calculateScales } from "./calculateScale";
 import { calculateAxis } from "./calculateAxis";
