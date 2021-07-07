@@ -39,13 +39,12 @@ import { LegendPosition } from "./enums";
 export function calculatePlot(data: EventDataPoints, settings: Settings): Settings {
     if (settings.legend.show) {
         const textProperties = settings.legend.TextProperties;
-        const textHeight =
-            (max(
+        const textHeight = <number>max(
                 data.legend.map((l: Legend) => {
                     textProperties.text = data.timeFormatter.format(l.legend);
                     return measureSvgTextHeight(textProperties);
                 })
-            ) as number) + 20;
+            ) + 20;
         switch (settings.legend.position) {
             case LegendPosition.TopLeft:
             case LegendPosition.TopCenter:

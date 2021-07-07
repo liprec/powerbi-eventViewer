@@ -55,13 +55,13 @@ export function drawPlot(
                 enter
                     .append("path")
                     .classed(Selectors.State.className, true)
-                    .attr("d", (state: State) => drawState(state.dataPoint as DataPoint))
+                    .attr("d", (state: State) => drawState(<DataPoint>state.dataPoint))
                     .attr("fill", (state: State) => getStateColor(state))
                     .style("opacity", (state: State) => (state.isHighlight ? 1 : 0.3)),
             update =>
                 update
                     .select(Selectors.State.selectorName)
-                    .attr("d", (state: State) => drawState(state.dataPoint as DataPoint))
+                    .attr("d", (state: State) => drawState(<DataPoint>state.dataPoint))
                     .attr("fill", (state: State) => getStateColor(state))
                     .style("opacity", (state: State) => (state.isHighlight ? 1 : 0.3)),
             exit => exit.remove()

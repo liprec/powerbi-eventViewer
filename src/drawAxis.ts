@@ -30,13 +30,9 @@ import powerbi from "powerbi-visuals-api";
 import { axisBottom, axisLeft } from "d3-axis";
 import { Selection } from "d3-selection";
 
-import ISelectionId = powerbi.visuals.ISelectionId;
-import ISelectionManager = powerbi.extensibility.ISelectionManager;
-
-import { Device, EventDataPoints } from "./data";
+import { EventDataPoints } from "./data";
 import { Selectors } from "./selectors";
 import { Settings } from "./settings";
-import { syncSelectionState } from "./syncSelectionState";
 
 export function drawAxis(
     selection: Selection<any, any, any, any>,
@@ -73,9 +69,9 @@ export function drawAxis(
         .call(timeAxis)
         .selectAll(".tick")
         .each(function() {
-            const size = (this as SVGAElement).getBoundingClientRect();
+            const size = (<SVGAElement>this).getBoundingClientRect();
             if (size.left < lastRight) {
-                (this as SVGAElement).setAttribute("opacity", "0");
+                (<SVGAElement>this).setAttribute("opacity", "0");
             } else {
                 lastRight = size.right;
             }

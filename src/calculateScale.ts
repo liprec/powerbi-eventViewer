@@ -32,7 +32,7 @@ import { scaleBand, scaleTime } from "d3";
 import { Device, EventDataPoints } from "./data";
 import { Settings } from "./settings";
 
-export function calculateScales(data: EventDataPoints, settings: Settings): Settings {
+export function calculateScale(data: EventDataPoints, settings: Settings): Settings {
     const plotDimensions = settings.general.plotDimensions;
     const timeScale = scaleTime()
         .domain(data.times)
