@@ -41,7 +41,7 @@ import { getObject } from "powerbi-visuals-utils-dataviewutils/lib/dataViewObjec
 import { TraceEvents } from "./enums";
 import { PerfTimer } from "./perfTimer";
 import { valueFormatter } from "powerbi-visuals-utils-formattingutils";
-import { parseSettings } from "./settings";
+import { parseSettings, Settings } from "./settings";
 import { Device, State, EventDataPoints, Legend } from "./data";
 import { max, min } from "d3";
 
@@ -49,8 +49,13 @@ const devicesRole = "device";
 const timeRole = "time";
 const stateRole = "event";
 
-// tslint:disable-next-line: max-func-body-length
-export function converter(dataView: DataView | undefined, viewPort: IViewport, host: IVisualHost, colors: ISandboxExtendedColorPalette, locale: string): EventDataPoints | undefined {
+export function converter(
+    dataView: DataView | undefined,
+    viewPort: IViewport,
+    host: IVisualHost,
+    colors: ISandboxExtendedColorPalette,
+    locale: string
+): EventDataPoints | undefined {
     const timer = PerfTimer.START(TraceEvents.convertor, true);
     if (!checkValidDataview(dataView)) {
         timer();
@@ -58,9 +63,19 @@ export function converter(dataView: DataView | undefined, viewPort: IViewport, h
     }
     const settings = parseSettings(<DataView>dataView);
     const metadata = dataView && dataView.metadata && dataView.metadata.columns;
-    const rows = <DataViewMatrixNode[]>(dataView && dataView.matrix && dataView.matrix.rows && dataView.matrix.rows.root && dataView.matrix.rows.root.children);
-    const rowLevels = <DataViewHierarchyLevel[]>(dataView && dataView.matrix && dataView.matrix.rows && dataView.matrix.rows.levels);
-    const timeColumn: DataViewMetadataColumn = <DataViewMetadataColumn>metadata?.filter((c: DataViewMetadataColumn) => (c.roles ? c.roles[timeRole] : false))[0];
+    const rows = <DataViewMatrixNode[]>(
+        (dataView &&
+            dataView.matrix &&
+            dataView.matrix.rows &&
+            dataView.matrix.rows.root &&
+            dataView.matrix.rows.root.children)
+    );
+    const rowLevels = <DataViewHierarchyLevel[]>(
+        (dataView && dataView.matrix && dataView.matrix.rows && dataView.matrix.rows.levels)
+    );
+    const timeColumn: DataViewMetadataColumn = <DataViewMetadataColumn>(
+        metadata?.filter((c: DataViewMetadataColumn) => (c.roles ? c.roles[timeRole] : false))[0]
+    );
 
     const timeFormatter = valueFormatter.create({
         format: timeColumn.format,
@@ -77,7 +92,38 @@ export function converter(dataView: DataView | undefined, viewPort: IViewport, h
             color: settings.unknown.color,
         });
     }
-    const devices: Device[] = rows.map((row: DataViewMatrixNode, index: number) => {
+    const devices: Device[] = getDevices(rows, host, rowLevels, timeSeries, legend, dataView, colors, timeFormatter);
+
+    const sTime = new Date(JSON.parse(JSON.stringify(<Date>min(timeSeries))));
+    if (settings.timeAxis.leadTime !== null)
+        sTime.setSeconds(sTime.getSeconds() + settings.timeAxis.leadTime * settings.timeAxis.leadTimePrecision);
+
+    updateDeviceStates(devices, settings, sTime, timeFormatter, timeSeries);
+
+    settings.general.width = viewPort.width - 2 * settings.general.padding;
+    settings.general.height = viewPort.height - 2 * settings.general.padding;
+
+    timer();
+    return {
+        devices,
+        times: [sTime, <Date>max(timeSeries)],
+        timeFormatter,
+        legend: legend.sort((l1, l2) => l1.index - l2.index),
+        settings,
+    };
+}
+
+function getDevices(
+    rows: powerbi.DataViewMatrixNode[],
+    host: IVisualHost,
+    rowLevels: powerbi.DataViewHierarchyLevel[],
+    timeSeries: Date[],
+    legend: Legend[],
+    dataView: powerbi.DataView | undefined,
+    colors: ISandboxExtendedColorPalette,
+    timeFormatter: valueFormatter.IValueFormatter
+): Device[] {
+    return rows.map((row: DataViewMatrixNode, index: number) => {
         const deviceSelectionId = host
             .createSelectionIdBuilder()
             .withMatrixNode(row, rowLevels)
@@ -98,7 +144,13 @@ export function converter(dataView: DataView | undefined, viewPort: IViewport, h
                     legend.push({
                         index: legend.length,
                         legend: <string>state?.toString(),
-                        color: getColorByIndex(legend.length, legend.length.toString(), dataView?.metadata.objects, "stateColor", colors),
+                        color: getColorByIndex(
+                            legend.length,
+                            legend.length.toString(),
+                            dataView?.metadata.objects,
+                            "stateColor",
+                            colors
+                        ),
                     });
                 }
                 const selectionId = host
@@ -123,10 +175,15 @@ export function converter(dataView: DataView | undefined, viewPort: IViewport, h
         }
         return device;
     });
+}
 
-    const sTime = new Date(JSON.parse(JSON.stringify(<Date>min(timeSeries))));
-    if (settings.timeAxis.leadTime !== null) sTime.setSeconds(sTime.getSeconds() + settings.timeAxis.leadTime * settings.timeAxis.leadTimePrecision);
-
+function updateDeviceStates(
+    devices: Device[],
+    settings: Settings,
+    sTime: Date,
+    timeFormatter: valueFormatter.IValueFormatter,
+    timeSeries: Date[]
+) {
     devices.forEach((device: Device) => {
         if (settings.unknown.show && device.states[0].time > sTime) {
             device.states = [
@@ -152,18 +209,6 @@ export function converter(dataView: DataView | undefined, viewPort: IViewport, h
         });
         device.states = device.states.filter((state: State) => <Date>state.endTime > sTime);
     });
-
-    settings.general.width = viewPort.width - 2 * settings.general.padding;
-    settings.general.height = viewPort.height - 2 * settings.general.padding;
-
-    timer();
-    return {
-        devices,
-        times: [sTime, <Date>max(timeSeries)],
-        timeFormatter,
-        legend: legend.sort((l1, l2) => l1.index - l2.index),
-        settings,
-    };
 }
 
 function checkValidDataview(dataView: DataView | undefined) {
@@ -178,7 +223,13 @@ function checkValidDataview(dataView: DataView | undefined) {
     );
 }
 
-function getColorByIndex(index: number, queryName: string, objects: powerbi.DataViewObjects | undefined, capability: string, colorPalette: ISandboxExtendedColorPalette): string {
+function getColorByIndex(
+    index: number,
+    queryName: string,
+    objects: powerbi.DataViewObjects | undefined,
+    capability: string,
+    colorPalette: ISandboxExtendedColorPalette
+): string {
     if (objects) {
         const color: any = getObject(objects, capability);
         if (color) {
