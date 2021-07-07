@@ -64,7 +64,7 @@ export function drawLegend(selection: Selection<any, any, any, any>, data: Event
                             .style("font-weight", settings.legend.fontWeight);
                     })
                     .each(function() {
-                        const size = (this as SVGGElement).getBoundingClientRect();
+                        const size = (<SVGGElement>this).getBoundingClientRect();
                         select(this).attr("transform", `translate(${moveX} 0)`);
                         moveX += size.width + 5;
                     }),
@@ -85,7 +85,7 @@ export function drawLegend(selection: Selection<any, any, any, any>, data: Event
                             .style("font-weight", settings.legend.fontWeight);
                     })
                     .each(function() {
-                        const size = (this as SVGGElement).getBoundingClientRect();
+                        const size = (<SVGGElement>this).getBoundingClientRect();
                         select(this).attr("transform", `translate(${moveX} 0)`);
                         moveX += size.width + 5;
                     }),

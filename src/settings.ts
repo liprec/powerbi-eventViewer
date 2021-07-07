@@ -60,14 +60,14 @@ class GeneralSettings {
 
     public get plotDimensions(): PlotDimensions {
         return {
-            x1: this.x + (this.axisDimensions.deviceAxisLabel.width as number),
+            x1: this.x + <number>this.axisDimensions.deviceAxisLabel.width,
             x2: this.width - this.padding,
             y1: this.y + (this.legendDimensions?.topHeight || 0),
             y2:
                 this.y +
                 this.height -
                 (this.legendDimensions?.bottomHeight || 0) -
-                (this.axisDimensions.timeAxisLabel.height as number),
+                <number>this.axisDimensions.timeAxisLabel.height,
         };
     }
 }
@@ -173,5 +173,5 @@ class UnknownSettings {
 }
 
 export function parseSettings(dataView: DataView): Settings {
-    return Settings.parse(dataView) as Settings;
+    return Settings.parse(dataView);
 }

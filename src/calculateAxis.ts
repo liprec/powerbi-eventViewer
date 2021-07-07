@@ -38,22 +38,20 @@ import { Settings } from "./settings";
 
 export function calculateAxis(data: EventDataPoints, settings: Settings): Settings {
     const deviceTextProperties = settings.deviceAxis.TextProperties;
-    const deviceTextWidth =
-        (max(
+    const deviceTextWidth = <number>max(
             data.devices.map((device: Device) => {
                 deviceTextProperties.text = device.name;
                 return measureSvgTextWidth(deviceTextProperties);
             })
-        ) as number) + 20;
+        ) + 20;
 
     const timeTextProperties = settings.timeAxis.TextProperties;
-    const timeTextHeight =
-        (max(
+    const timeTextHeight = <number>max(
             data.times.map((date: Date) => {
                 timeTextProperties.text = data.timeFormatter.format(date);
                 return measureSvgTextHeight(timeTextProperties);
             })
-        ) as number) + 20;
+        ) + 20;
 
     settings.general.axisDimensions = {
         deviceAxisLabel: { width: deviceTextWidth },

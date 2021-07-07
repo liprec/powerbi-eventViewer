@@ -23,5 +23,5 @@
         "removeComments": true,
         "strict": true
     },
-    "files": ["./src/visual.ts"]
+    "files": ["src/eventViewer.ts"]
 }

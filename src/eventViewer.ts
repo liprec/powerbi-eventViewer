@@ -40,7 +40,7 @@ import EnumerateVisualObjectInstancesOptions = powerbi.EnumerateVisualObjectInst
 import ISandboxExtendedColorPalette = powerbi.extensibility.ISandboxExtendedColorPalette;
 import ISelectionId = powerbi.visuals.ISelectionId;
 import ISelectionManager = powerbi.extensibility.ISelectionManager;
-import IViewPort = powerbi.IViewport;
+import IViewport = powerbi.IViewport;
 import IVisual = powerbi.extensibility.visual.IVisual;
 import IVisualHost = powerbi.extensibility.visual.IVisualHost;
 import VisualConstructorOptions = powerbi.extensibility.visual.VisualConstructorOptions;
@@ -56,7 +56,7 @@ import { PerfTimer } from "./perfTimer";
 import { TraceEvents } from "./enums";
 import { Device, EventDataPoints, Legend, State } from "./data";
 import { calculatePlot } from "./calculatePlot";
-import { calculateScales } from "./calculateScale";
+import { calculateScale } from "./calculateScale";
 import { calculateAxis } from "./calculateAxis";
 import { drawAxis } from "./drawAxis";
 import { drawPlot } from "./drawPlot";
@@ -80,7 +80,7 @@ export class EventViewer implements IVisual {
 
     private settings: Settings;
     private dataView: DataView;
-    private viewPort: IViewPort;
+    private viewPort: IViewport;
     private colorPalette: ISandboxExtendedColorPalette;
     private host: IVisualHost;
     private selectionManager: ISelectionManager;
@@ -98,7 +98,7 @@ export class EventViewer implements IVisual {
         this.selectionManager.registerOnSelectCallback(() => {
             syncSelectionState(
                 this.svg.selectAll(Selectors.State.selectorName),
-                this.selectionManager.getSelectionIds() as ISelectionId[]
+                <ISelectionId[]>this.selectionManager.getSelectionIds()
             );
         });
         this.allowInteractions = options.host.allowInteractions;
@@ -115,6 +115,15 @@ export class EventViewer implements IVisual {
                     syncSelectionState(this.svg.selectAll(Selectors.State.selectorName), []);
                 });
             }
+        });
+        this.svg.on("contextmenu", (event: MouseEvent) => {
+            const eventTarget: HTMLElement = <HTMLElement>event.target;
+            const dataPoint = <State>select(eventTarget).datum();
+            this.selectionManager.showContextMenu((dataPoint && dataPoint.selectionId) || {}, {
+                x: event.clientX,
+                y: event.clientY,
+            });
+            event.preventDefault();
         });
         this.plotArea = this.svg.append("g").classed(Selectors.PlotArea.className, true);
         this.axis = this.svg.append("g").classed(Selectors.Axis.className, true);
@@ -140,20 +149,16 @@ export class EventViewer implements IVisual {
         }
         this.viewPort = options && options.viewport;
         this.dataView = options && options.dataViews && options.dataViews[0];
-        this.data = converter(
-            this.dataView,
-            options.viewport,
-            this.host,
-            this.colorPalette,
-            this.locale
-        ) as EventDataPoints;
+        this.data = <EventDataPoints>(
+            converter(this.dataView, options.viewport, this.host, this.colorPalette, this.locale)
+        );
         if (!this.data) {
             timer();
         }
         this.settings = this.data.settings;
         this.settings = calculatePlot(this.data, this.settings);
         this.settings = calculateAxis(this.data, this.settings);
-        this.settings = calculateScales(this.data, this.settings);
+        this.settings = calculateScale(this.data, this.settings);
         this.data = calculateData(this.data, this.settings);
 
         this.svg.attr("viewBox", `0,0,${options.viewport.width},${options.viewport.height}`);
@@ -172,7 +177,7 @@ export class EventViewer implements IVisual {
         this.tooltipServiceWrapper.addTooltip(
             this.plotArea.selectAll(Selectors.State.selectorName),
             (state: State) => (state.tooltip ? state.tooltip() : []),
-            (state: State) => state.selectionId as ISelectionId
+            (state: State) => (state.selectionId ? <ISelectionId>state.selectionId : [])
         );
 
         timer();
@@ -236,18 +241,18 @@ export class EventViewer implements IVisual {
         instanceEnumeration: VisualObjectInstanceEnumeration,
         instance: VisualObjectInstance
     ): void {
-        if ((instanceEnumeration as VisualObjectInstanceEnumerationObject).instances) {
-            (instanceEnumeration as VisualObjectInstanceEnumerationObject).instances.push(instance);
+        if ((<VisualObjectInstanceEnumerationObject>instanceEnumeration).instances) {
+            (<VisualObjectInstanceEnumerationObject>instanceEnumeration).instances.push(instance);
         } else {
-            (instanceEnumeration as VisualObjectInstance[]).push(instance);
+            (<VisualObjectInstance[]>instanceEnumeration).push(instance);
         }
     }
 
     public removeEnumerateObject(instanceEnumeration: VisualObjectInstanceEnumeration, objectName: string): void {
-        if ((instanceEnumeration as VisualObjectInstanceEnumerationObject).instances) {
-            delete (instanceEnumeration as VisualObjectInstanceEnumerationObject).instances[0].properties[objectName];
+        if ((<VisualObjectInstanceEnumerationObject>instanceEnumeration).instances) {
+            delete (<VisualObjectInstanceEnumerationObject>instanceEnumeration).instances[0].properties[objectName];
         } else {
-            delete (instanceEnumeration as VisualObjectInstance[])[0].properties[objectName];
+            delete (<VisualObjectInstance[]>instanceEnumeration)[0].properties[objectName];
         }
     }
 }

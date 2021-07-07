@@ -34,14 +34,14 @@ export function calculateData(data: EventDataPoints, settings: Settings): EventD
     data.devices.forEach((device: Device) => {
         device.states.forEach((state: State) => {
             if (!state.dataPoint) {
-                state.dataPoint = {
+                state.dataPoint = <DataPoint>{
                     x1: settings.general.scales.timeScale(state.time),
-                    x2: settings.general.scales.timeScale(state.endTime as Date),
+                    x2: settings.general.scales.timeScale(<Date>state.endTime),
                     y1: settings.general.scales.deviceScale(device.name),
                     y2:
-                        (settings.general.scales.deviceScale(device.name) as number) +
+                        <number>settings.general.scales.deviceScale(device.name) +
                         settings.general.scales.deviceScale.bandwidth(),
-                } as DataPoint;
+                };
             }
         });
         device.key = device.states
