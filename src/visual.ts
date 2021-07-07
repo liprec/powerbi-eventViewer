@@ -116,6 +116,15 @@ export class EventViewer implements IVisual {
                 });
             }
         });
+        this.svg.on("contextmenu", (event: MouseEvent) => {
+            const eventTarget: HTMLElement = event.target as HTMLElement;
+            const dataPoint = select(eventTarget).datum() as State;
+            this.selectionManager.showContextMenu((dataPoint && dataPoint.selectionId) || {}, {
+                x: event.clientX,
+                y: event.clientY,
+            });
+            event.preventDefault();
+        });
         this.plotArea = this.svg.append("g").classed(Selectors.PlotArea.className, true);
         this.axis = this.svg.append("g").classed(Selectors.Axis.className, true);
         this.legendArea = this.svg.append("g").classed(Selectors.LegendArea.className, true);
@@ -172,7 +181,7 @@ export class EventViewer implements IVisual {
         this.tooltipServiceWrapper.addTooltip(
             this.plotArea.selectAll(Selectors.State.selectorName),
             (state: State) => (state.tooltip ? state.tooltip() : []),
-            (state: State) => state.selectionId as ISelectionId
+            (state: State) => (state.selectionId ? (state.selectionId as ISelectionId) : [])
         );
 
         timer();
