@@ -42,6 +42,7 @@ import ISelectionId = powerbi.visuals.ISelectionId;
 import ISelectionManager = powerbi.extensibility.ISelectionManager;
 import IViewport = powerbi.IViewport;
 import IVisual = powerbi.extensibility.visual.IVisual;
+import IVisualEventService = powerbi.extensibility.IVisualEventService;
 import IVisualHost = powerbi.extensibility.visual.IVisualHost;
 import VisualConstructorOptions = powerbi.extensibility.visual.VisualConstructorOptions;
 import VisualObjectInstance = powerbi.VisualObjectInstance;
@@ -77,6 +78,7 @@ export class EventViewer implements IVisual {
     private legendTimeoutId?: number;
     private locale: string;
     private data: EventDataPoints;
+    private events: IVisualEventService;
 
     private settings: Settings;
     private dataView: DataView;
@@ -136,14 +138,18 @@ export class EventViewer implements IVisual {
             .attr("fill", "none");
         this.axis.append("g").classed(Selectors.deviceAxis.className, true);
         this.axis.append("g").classed(Selectors.timeAxis.className, true);
+        this.events = options.host.eventService;
         timer();
     }
+
     update(options: VisualUpdateOptions): void {
         const timer = PerfTimer.START(TraceEvents.update, true);
+        this.events.renderingStarted(options);
         if (
             isEqual(this.dataView, options && options.dataViews && options.dataViews[0]) &&
             isEqual(this.viewPort, options && options.viewport)
         ) {
+            this.events.renderingFinished(options);
             timer();
             return;
         }
@@ -153,6 +159,7 @@ export class EventViewer implements IVisual {
             converter(this.dataView, options.viewport, this.host, this.colorPalette, this.locale)
         );
         if (!this.data) {
+            this.events.renderingFinished(options);
             timer();
         }
         this.settings = this.data.settings;
@@ -180,6 +187,7 @@ export class EventViewer implements IVisual {
             (state: State) => (state.selectionId ? <ISelectionId>state.selectionId : [])
         );
 
+        this.events.renderingFinished(options);
         timer();
     }
 
