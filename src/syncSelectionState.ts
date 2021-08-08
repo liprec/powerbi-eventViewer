@@ -79,6 +79,6 @@ function isSelectionIdInArray(selectionIds: ISelectionId[], selectionId?: ISelec
         return false;
     }
     return selectionIds.some((currentSelectionId: ISelectionId) => {
-        return currentSelectionId.getKey() === selectionId.getKey();
+        return currentSelectionId.includes(selectionId);
     });
 }
