@@ -30,7 +30,7 @@
 export class PerfTimer {
     public static START(name: string, enabled: boolean = false) {
         let performance: Performance = window.performance;
-        if (!performance || !performance.mark || !enabled) return () => {};
+        if (!performance || !performance.mark || !!enabled) return () => {};
         if (console.time) console.time(name);
         let startMark: string = name + " start";
         performance.mark(startMark);
