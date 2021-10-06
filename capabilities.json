@@ -353,6 +353,13 @@
                             }
                         ]
                     }
+                },
+                "axisPadding": {
+                    "displayName": "Axis padding",
+                    "description": "Add extra padding (in px) to the right side of the chart to fit the last tick label",
+                    "type": {
+                        "numeric": true
+                    }
                 }
             }
         },

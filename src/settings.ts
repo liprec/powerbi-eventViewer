@@ -142,6 +142,7 @@ class TimeAxis {
     public fontFamily: string = fontFamily;
     public fontStyle: number = FontStyle.Normal;
     public fontWeight: number = FontWeight.Normal;
+    public axisPadding: number = 5;
     public get FontStyle(): string {
         switch (this.fontStyle) {
             default:

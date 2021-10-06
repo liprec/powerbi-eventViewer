@@ -36,7 +36,7 @@ export function calculateScale(data: EventDataPoints, settings: Settings): Setti
     const plotDimensions = settings.general.plotDimensions;
     const timeScale = scaleTime()
         .domain(data.times)
-        .range([plotDimensions.x1, plotDimensions.x2]);
+        .range([plotDimensions.x1, plotDimensions.x2 - settings.timeAxis.axisPadding]);
     const legendScale = scaleBand()
         .domain(data.devices.map((device: Device) => device.name))
         .range([plotDimensions.y1, plotDimensions.y2])
