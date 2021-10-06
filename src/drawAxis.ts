@@ -70,7 +70,7 @@ export function drawAxis(
         .selectAll(".tick")
         .each(function() {
             const size = (<SVGAElement>this).getBoundingClientRect();
-            if (size.left < lastRight) {
+            if (size.left < lastRight || size.right > settings.general.plotDimensions.x2) {
                 (<SVGAElement>this).setAttribute("opacity", "0");
             } else {
                 lastRight = size.right;
