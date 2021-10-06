@@ -62,35 +62,29 @@ export function drawLegend(selection: Selection<any, any, any, any>, data: Event
                             .style("font-size", settings.legend.FontSize)
                             .style("font-style", settings.legend.FontStyle)
                             .style("font-weight", settings.legend.fontWeight);
-                    })
-                    .each(function() {
-                        const size = (<SVGGElement>this).getBoundingClientRect();
-                        select(this).attr("transform", `translate(${moveX} 0)`);
-                        moveX += size.width + 5;
                     }),
             update =>
-                update
-                    .classed("hidden", !settings.legend.show)
-                    .each(function(d) {
-                        select(this)
-                            .selectAll(".legendMarker")
-                            .style("fill", d.color);
-                        select(this)
-                            .selectAll(".legendText")
-                            .text(d.legend)
-                            .style("fill", settings.legend.fontColor)
-                            .style("font-family", settings.legend.fontFamily)
-                            .style("font-size", settings.legend.FontSize)
-                            .style("font-style", settings.legend.FontStyle)
-                            .style("font-weight", settings.legend.fontWeight);
-                    })
-                    .each(function() {
-                        const size = (<SVGGElement>this).getBoundingClientRect();
-                        select(this).attr("transform", `translate(${moveX} 0)`);
-                        moveX += size.width + 5;
-                    }),
+                update.classed("hidden", !settings.legend.show).each(function(d) {
+                    select(this)
+                        .selectAll(".legendMarker")
+                        .style("fill", d.color);
+                    select(this)
+                        .selectAll(".legendText")
+                        .text(d.legend)
+                        .style("fill", settings.legend.fontColor)
+                        .style("font-family", settings.legend.fontFamily)
+                        .style("font-size", settings.legend.FontSize)
+                        .style("font-style", settings.legend.FontStyle)
+                        .style("font-weight", settings.legend.fontWeight);
+                }),
             exit => exit.remove()
         );
+
+    selection.selectAll(Selectors.LegendItem.selectorName).each(function() {
+        const size = (<SVGGElement>this).getBoundingClientRect();
+        select(this).attr("transform", `translate(${moveX} 0)`);
+        moveX += size.width + 5;
+    });
 
     selection.attr("transform", function(d) {
         const size = (<SVGGElement>this).getBoundingClientRect();
