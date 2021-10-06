@@ -134,6 +134,8 @@ class DeviceAxis {
 class TimeAxis {
     leadTime: number | null = null;
     leadTimePrecision: number = TimePrecision.Second;
+    lagTime: number | null = null;
+    lagTimePrecision: number = TimePrecision.Second;
     // Default text settings
     public fontColor: string = "#666666";
     public fontSize: number = 11;

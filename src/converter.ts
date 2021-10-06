@@ -95,10 +95,14 @@ export function converter(
     const devices: Device[] = getDevices(rows, host, rowLevels, timeSeries, legend, dataView, colors, timeFormatter);
 
     const sTime = new Date(JSON.parse(JSON.stringify(<Date>min(timeSeries))));
+    const eTime = new Date(JSON.parse(JSON.stringify(<Date>max(timeSeries))));
+
     if (settings.timeAxis.leadTime !== null)
         sTime.setSeconds(sTime.getSeconds() + settings.timeAxis.leadTime * settings.timeAxis.leadTimePrecision);
+    if (settings.timeAxis.lagTime !== null)
+        eTime.setSeconds(eTime.getSeconds() + settings.timeAxis.lagTime * settings.timeAxis.lagTimePrecision);
 
-    updateDeviceStates(devices, settings, sTime, timeFormatter, timeSeries);
+    updateDeviceStates(devices, settings, sTime, eTime, timeFormatter, timeSeries);
 
     settings.general.width = viewPort.width - 2 * settings.general.padding;
     settings.general.height = viewPort.height - 2 * settings.general.padding;
@@ -106,7 +110,7 @@ export function converter(
     timer();
     return {
         devices,
-        times: [sTime, <Date>max(timeSeries)],
+        times: [sTime, eTime],
         timeFormatter,
         legend: legend.sort((l1, l2) => l1.index - l2.index),
         settings,
@@ -123,6 +127,7 @@ function getDevices(
     colors: ISandboxExtendedColorPalette,
     timeFormatter: valueFormatter.IValueFormatter
 ): Device[] {
+    const unknownCorrection = legend.length;
     return rows.map((row: DataViewMatrixNode, index: number) => {
         const deviceSelectionId = host
             .createSelectionIdBuilder()
@@ -146,7 +151,7 @@ function getDevices(
                         legend: <string>state?.toString(),
                         color: getColorByIndex(
                             legend.length,
-                            legend.length.toString(),
+                            (legend.length - unknownCorrection).toString(),
                             dataView?.metadata.objects,
                             "stateColor",
                             colors
@@ -181,6 +186,7 @@ function updateDeviceStates(
     devices: Device[],
     settings: Settings,
     sTime: Date,
+    eTime: Date,
     timeFormatter: valueFormatter.IValueFormatter,
     timeSeries: Date[]
 ) {
@@ -204,7 +210,7 @@ function updateDeviceStates(
         const nrOfEvents = device.states.length;
         device.states.forEach((state: State, index: number, all: State[]) => {
             if (index < nrOfEvents - 1) state.endTime = all[index + 1].time;
-            else state.endTime = max(timeSeries);
+            else state.endTime = eTime; //max(timeSeries);
             if (state.time < sTime) state.time = sTime;
         });
         device.states = device.states.filter((state: State) => <Date>state.endTime > sTime);

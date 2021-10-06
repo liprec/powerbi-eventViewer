@@ -248,12 +248,39 @@
             "properties": {
                 "leadTime": {
                     "displayName": "Lead time",
+                    "description": "Alter the start of the time axis: positive to move the start foreward and negative to move it backwards",
                     "type": {
                         "numeric": true
                     }
                 },
                 "leadTimePrecision": {
                     "displayName": "Lead time precision",
+                    "type": {
+                        "enumeration": [
+                            {
+                                "displayName": "Second(s)",
+                                "value": "1"
+                            },
+                            {
+                                "displayName": "Minute(s)",
+                                "value": "60"
+                            },
+                            {
+                                "displayName": "Hour(s)",
+                                "value": "3600"
+                            }
+                        ]
+                    }
+                },
+                "lagTime": {
+                    "displayName": "Lag time",
+                    "description": "Alter the end of the time axis: positive to move the start foreward and negative to move it backwards",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "lagTimePrecision": {
+                    "displayName": "Lag time precision",
                     "type": {
                         "enumeration": [
                             {
