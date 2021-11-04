@@ -54,7 +54,7 @@ import { Settings } from "./settings";
 import { converter } from "./converter";
 import { syncSelectionState } from "./syncSelectionState";
 import { PerfTimer } from "./perfTimer";
-import { TraceEvents } from "./enums";
+import { Checks, FontWeight, TraceEvents } from "./enums";
 import { Device, EventDataPoints, Legend, State } from "./data";
 import { calculatePlot } from "./calculatePlot";
 import { calculateScale } from "./calculateScale";
@@ -62,6 +62,7 @@ import { calculateAxis } from "./calculateAxis";
 import { drawAxis } from "./drawAxis";
 import { drawPlot } from "./drawPlot";
 import { drawLegend } from "./drawLegend";
+import { drawChecks } from "./drawChecks";
 import { Selectors } from "./selectors";
 import { calculateData } from "./calculateData";
 
@@ -71,14 +72,18 @@ export class EventViewer implements IVisual {
     private svg: Selection<any, any, any, any>;
     private plotArea: Selection<any, any, any, any>;
     private axis: Selection<any, any, any, any>;
+    private checkList: Selection<any, any, any, any>;
     private devices: Selection<any, any, any, any>;
     private legendArea: Selection<any, any, any, any>;
     private legendBorder: Selection<any, any, any, any>;
     private legend: Selection<any, any, any, any>;
+    private landingPage: Selection<any, any, any, any>;
     private legendTimeoutId?: number;
     private locale: string;
     private data: EventDataPoints;
     private events: IVisualEventService;
+    private isLandingPageOn: boolean;
+    private landingPageRemoved: boolean;
 
     private settings: Settings;
     private dataView: DataView;
@@ -91,6 +96,7 @@ export class EventViewer implements IVisual {
     private renderTimeoutId: number | undefined;
     private colorConfig: any[];
     private styleConfig: any[];
+    private checks: any;
 
     constructor(options: VisualConstructorOptions) {
         const timer = PerfTimer.START(TraceEvents.constructor, true);
@@ -127,6 +133,11 @@ export class EventViewer implements IVisual {
             });
             event.preventDefault();
         });
+        this.checkList = this.svg.append("g").classed(Selectors.CheckList.className, true);
+        this.checkList
+            .append("text")
+            .text("To use this visual provide the following fields:")
+            .style("font-weight", FontWeight.Bold);
         this.plotArea = this.svg.append("g").classed(Selectors.PlotArea.className, true);
         this.axis = this.svg.append("g").classed(Selectors.Axis.className, true);
         this.legendArea = this.svg.append("g").classed(Selectors.LegendArea.className, true);
@@ -139,6 +150,9 @@ export class EventViewer implements IVisual {
         this.axis.append("g").classed(Selectors.deviceAxis.className, true);
         this.axis.append("g").classed(Selectors.timeAxis.className, true);
         this.events = options.host.eventService;
+        this.checks = JSON.parse(
+            `{ "${Checks.Device}": false, "${Checks.State}": false, "${Checks.Time}": false, "${Checks.ValidTime}": false }`
+        );
         timer();
     }
 
@@ -155,20 +169,43 @@ export class EventViewer implements IVisual {
         }
         this.viewPort = options && options.viewport;
         this.dataView = options && options.dataViews && options.dataViews[0];
+
         this.data = <EventDataPoints>(
-            converter(this.dataView, options.viewport, this.host, this.colorPalette, this.locale)
+            converter(
+                this.dataView,
+                options.viewport,
+                this.host,
+                this.colorPalette,
+                this.locale,
+                (check: string, status: boolean) => (this.checks[check] = status)
+            )
         );
+
+        this.svg.attr("viewBox", `0,0,${options.viewport.width},${options.viewport.height}`);
+        drawChecks(this.checkList, this.checks);
+
         if (!this.data) {
+            if (this.checks[Checks.Time] && !this.checks[Checks.ValidTime])
+                this.host.displayWarningIcon(
+                    "Error in 'Time' field",
+                    "Provided field for the 'Time' does not contain date/time values"
+                );
+            this.devices.selectAll("*").remove();
+            this.axis
+                .selectAll("*")
+                .selectAll("*")
+                .remove();
+            this.legend.selectAll("*").remove();
             this.events.renderingFinished(options);
             timer();
+            return;
         }
+
         this.settings = this.data.settings;
         this.settings = calculatePlot(this.data, this.settings);
         this.settings = calculateAxis(this.data, this.settings);
         this.settings = calculateScale(this.data, this.settings);
         this.data = calculateData(this.data, this.settings);
-
-        this.svg.attr("viewBox", `0,0,${options.viewport.width},${options.viewport.height}`);
 
         drawAxis(this.axis, this.data, this.settings, (event: MouseEvent, deviceName: string) => {
             const currentDevice = this.data.devices.filter((device: Device) => device.name === deviceName);

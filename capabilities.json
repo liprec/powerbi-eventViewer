@@ -409,6 +409,8 @@
     "supportsKeyboardFocus": false,
     "suppressDefaultTitle": true,
     "supportsHighlight": true,
+    "supportsLandingPage": true,
+    "supportsEmptyDataView": false,
     "sorting": {
         "default": {}
     },

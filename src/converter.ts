@@ -36,28 +36,26 @@ import ISandboxExtendedColorPalette = powerbi.extensibility.ISandboxExtendedColo
 import IViewport = powerbi.IViewport;
 import IVisualHost = powerbi.extensibility.visual.IVisualHost;
 import VisualTooltipDataItem = powerbi.extensibility.VisualTooltipDataItem;
+import PrimitiveValue = powerbi.PrimitiveValue;
 
 import { getObject } from "powerbi-visuals-utils-dataviewutils/lib/dataViewObjects";
-import { TraceEvents } from "./enums";
+import { Checks, Roles, TraceEvents } from "./enums";
 import { PerfTimer } from "./perfTimer";
 import { valueFormatter } from "powerbi-visuals-utils-formattingutils";
 import { parseSettings, Settings } from "./settings";
 import { Device, State, EventDataPoints, Legend } from "./data";
 import { max, min } from "d3";
 
-const devicesRole = "device";
-const timeRole = "time";
-const stateRole = "event";
-
 export function converter(
     dataView: DataView | undefined,
     viewPort: IViewport,
     host: IVisualHost,
     colors: ISandboxExtendedColorPalette,
-    locale: string
+    locale: string,
+    setCheck: (check: string, status: boolean) => void
 ): EventDataPoints | undefined {
     const timer = PerfTimer.START(TraceEvents.convertor, true);
-    if (!checkValidDataview(dataView)) {
+    if (!checkValidDataview(dataView, setCheck)) {
         timer();
         return;
     }
@@ -74,7 +72,7 @@ export function converter(
         (dataView && dataView.matrix && dataView.matrix.rows && dataView.matrix.rows.levels)
     );
     const timeColumn: DataViewMetadataColumn = <DataViewMetadataColumn>(
-        metadata?.filter((c: DataViewMetadataColumn) => (c.roles ? c.roles[timeRole] : false))[0]
+        metadata?.filter((c: DataViewMetadataColumn) => (c.roles ? c.roles[Roles.TimeRole] : false))[0]
     );
 
     const timeFormatter = valueFormatter.create({
@@ -217,16 +215,46 @@ function updateDeviceStates(
     });
 }
 
-function checkValidDataview(dataView: DataView | undefined) {
-    return !!(
+function checkValidDataview(dataView: DataView | undefined, setCheck: (check: Checks, status: boolean) => void) {
+    const checkDevices = !!(
+        dataView &&
+        dataView.metadata &&
+        dataView.metadata.columns &&
+        dataView.metadata.columns.filter((c: DataViewMetadataColumn) => (c.roles ? c.roles[Roles.DevicesRole] : false))
+            .length > 0
+    );
+    const checkState = !!(
+        dataView &&
+        dataView.metadata &&
+        dataView.metadata.columns &&
+        dataView.metadata.columns.filter((c: DataViewMetadataColumn) => (c.roles ? c.roles[Roles.StateRole] : false))
+            .length > 0
+    );
+    const checkTime = !!(
+        dataView &&
+        dataView.metadata &&
+        dataView.metadata.columns &&
+        dataView.metadata.columns.filter((c: DataViewMetadataColumn) => (c.roles ? c.roles[Roles.TimeRole] : false))
+            .length > 0
+    );
+    const checkValidTime = !!(
         dataView &&
         dataView.matrix &&
-        dataView.matrix.rows &&
-        dataView.matrix.rows.levels &&
-        dataView.matrix.rows.levels.length > 0 &&
         dataView.matrix.rows.root &&
-        dataView.matrix.rows.root.children
+        dataView.matrix.rows.root.children &&
+        dataView.matrix.rows.root.children.length > 0 &&
+        dataView.matrix.rows.root.children[0].children &&
+        dataView.matrix.rows.root.children[0].children.length > 0 &&
+        isValidDate(dataView.matrix.rows.root.children[0].children[0].value)
     );
+    const isValid = checkDevices && checkState && checkTime && checkValidTime;
+
+    setCheck(Checks.Device, checkDevices);
+    setCheck(Checks.Time, checkTime);
+    setCheck(Checks.ValidTime, checkTime && checkValidTime);
+    setCheck(Checks.State, checkState);
+
+    return isValid;
 }
 
 function getColorByIndex(
@@ -275,4 +303,8 @@ function getTooltip(this: State): VisualTooltipDataItem[] {
             value: this.formatter.format(this.endTime),
         },
     ];
+}
+
+function isValidDate(date?: PrimitiveValue) {
+    return date instanceof Date && !isNaN(date.getTime());
 }
