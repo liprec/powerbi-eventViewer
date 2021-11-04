@@ -34,7 +34,10 @@ import createClassAndSelector = CssConstants.createClassAndSelector;
 
 export class Selectors {
     public static Svg: ClassAndSelector = createClassAndSelector("svg");
+    public static CheckList: ClassAndSelector = createClassAndSelector("checkList");
+    public static CheckListItem: ClassAndSelector = createClassAndSelector("checkListItem");
     public static PlotArea: ClassAndSelector = createClassAndSelector("plotarea");
+    public static LandingPage: ClassAndSelector = createClassAndSelector("landingPage");
     public static LegendArea: ClassAndSelector = createClassAndSelector("legendarea");
     public static LegendBorder: ClassAndSelector = createClassAndSelector("legendborder");
     public static Legend: ClassAndSelector = createClassAndSelector("legend");

@@ -72,6 +72,19 @@ export enum TimePrecision {
     Hour = 3600,
 }
 
+export enum Roles {
+    DevicesRole = "device",
+    TimeRole = "time",
+    StateRole = "event",
+}
+
+export enum Checks {
+    Device = "Device field",
+    Time = "Time field",
+    ValidTime = "Time field contains date/time values",
+    State = "Event/State field",
+}
+
 export enum TraceEvents {
     constructor = "EventViewer: Constructor",
     convertor = "EventViewer: Convertor method",
