@@ -28,7 +28,7 @@
 "use strict";
 import powerbi from "powerbi-visuals-api";
 
-import { Selection } from "d3-selection";
+import { BaseType, Selection } from "d3-selection";
 
 import ISelectionId = powerbi.visuals.ISelectionId;
 import { PerfTimer } from "./perfTimer";
@@ -37,10 +37,13 @@ import { State } from "./data";
 export const highlightOpacity = 1;
 export const backgroundOpacity = 0.25;
 
-export function syncSelectionState(selections: Selection<any, any, any, any>, selectionIds: ISelectionId[]) {
+export function syncSelectionState(
+    selections: Selection<BaseType, unknown, BaseType, unknown>,
+    selectionIds: ISelectionId[]
+) {
     const timer = PerfTimer.START("syncSelectionState()", true);
-    let highlightOpacity = 1;
-    let backgroundOpacity = 0.4;
+    const highlightOpacity = 1;
+    const backgroundOpacity = 0.4;
     if (!selections || !selectionIds) {
         timer();
         return;

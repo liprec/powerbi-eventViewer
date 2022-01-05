@@ -33,7 +33,7 @@ import { max } from "d3";
 import measureSvgTextHeight = textMeasurementService.measureSvgTextHeight;
 import measureSvgTextWidth = textMeasurementService.measureSvgTextWidth;
 
-import { Device, EventDataPoints, Legend } from "./data";
+import { Device, EventDataPoints } from "./data";
 import { Settings } from "./settings";
 
 export function calculateAxis(data: EventDataPoints, settings: Settings): Settings {

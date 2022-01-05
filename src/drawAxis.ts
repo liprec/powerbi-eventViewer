@@ -26,19 +26,18 @@
  */
 
 "use strict";
-import powerbi from "powerbi-visuals-api";
 import { axisBottom, axisLeft } from "d3-axis";
-import { Selection } from "d3-selection";
+import { BaseType, Selection } from "d3-selection";
 
 import { EventDataPoints } from "./data";
 import { Selectors } from "./selectors";
 import { Settings } from "./settings";
 
 export function drawAxis(
-    selection: Selection<any, any, any, any>,
+    selection: Selection<BaseType, unknown, BaseType, unknown>,
     data: EventDataPoints,
     settings: Settings,
-    clickEvent: (event: MouseEvent, deviceName: any) => void
+    clickEvent: (event: MouseEvent, deviceName: string) => void
 ): void {
     let lastRight = 0;
     const deviceAxis = axisLeft(settings.general.scales.deviceScale);
@@ -68,7 +67,7 @@ export function drawAxis(
         .style("font-style", settings.timeAxis.FontStyle)
         .call(timeAxis)
         .selectAll(".tick")
-        .each(function() {
+        .each(function () {
             const size = (<SVGAElement>this).getBoundingClientRect();
             if (size.left < lastRight || size.right > settings.general.plotDimensions.x2) {
                 (<SVGAElement>this).setAttribute("opacity", "0");

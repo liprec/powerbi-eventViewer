@@ -37,7 +37,7 @@ import DataView = powerbi.DataView;
 import DataViewObjectsParser = dataViewObjectsParser.DataViewObjectsParser;
 import TextProperties = interfaces.TextProperties;
 
-const fontFamily: string = "'Segoe UI', wf_segoe-ui_normal, helvetica, arial, sans-serif";
+const fontFamily = "'Segoe UI', wf_segoe-ui_normal, helvetica, arial, sans-serif";
 
 export class Settings extends DataViewObjectsParser {
     public general: GeneralSettings = new GeneralSettings();
@@ -49,7 +49,7 @@ export class Settings extends DataViewObjectsParser {
 }
 
 class GeneralSettings {
-    public padding: number = 5;
+    public padding = 5;
     public x: number = this.padding;
     public y: number = this.padding;
     public width: number;
@@ -73,10 +73,10 @@ class GeneralSettings {
 }
 
 class LegendSettings {
-    public show: boolean = true;
+    public show = true;
     public position: LegendPosition = LegendPosition.TopLeft;
-    public fontColor: string = "#666666";
-    public fontSize: number = 11;
+    public fontColor = "#666666";
+    public fontSize = 11;
     public fontFamily: string = fontFamily;
     public fontStyle: number = FontStyle.Normal;
     public fontWeight: number = FontWeight.Normal;
@@ -104,8 +104,8 @@ class LegendSettings {
 
 class DeviceAxis {
     // Default text settings
-    public fontColor: string = "#666666";
-    public fontSize: number = 11;
+    public fontColor = "#666666";
+    public fontSize = 11;
     public fontFamily: string = fontFamily;
     public fontStyle: number = FontStyle.Normal;
     public fontWeight: number = FontWeight.Normal;
@@ -137,12 +137,12 @@ class TimeAxis {
     lagTime: number | null = null;
     lagTimePrecision: number = TimePrecision.Second;
     // Default text settings
-    public fontColor: string = "#666666";
-    public fontSize: number = 11;
+    public fontColor = "#666666";
+    public fontSize = 11;
     public fontFamily: string = fontFamily;
     public fontStyle: number = FontStyle.Normal;
     public fontWeight: number = FontWeight.Normal;
-    public axisPadding: number = 5;
+    public axisPadding = 5;
     public get FontStyle(): string {
         switch (this.fontStyle) {
             default:
@@ -166,13 +166,13 @@ class TimeAxis {
 }
 
 class StateColorSettings {
-    public fill: string = "#EEEEEE";
+    public fill = "#EEEEEE";
 }
 
 class UnknownSettings {
-    public show: boolean = true;
-    public label: string = "Unknown";
-    public color: string = "#EEEEEE";
+    public show = false;
+    public label = "Unknown";
+    public color = "#EEEEEE";
 }
 
 export function parseSettings(dataView: DataView): Settings {

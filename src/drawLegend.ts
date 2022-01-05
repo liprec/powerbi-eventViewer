@@ -27,6 +27,7 @@
 
 "use strict";
 
+import { BaseType } from "d3";
 import { Selection, select } from "d3-selection";
 
 import { EventDataPoints } from "./data";
@@ -34,22 +35,22 @@ import { LegendPosition } from "./enums";
 import { Selectors } from "./selectors";
 import { Settings } from "./settings";
 
-export function drawLegend(selection: Selection<any, any, any, any>, data: EventDataPoints, settings: Settings): void {
+export function drawLegend(
+    selection: Selection<BaseType, unknown, BaseType, unknown>,
+    data: EventDataPoints,
+    settings: Settings
+): void {
     let moveX = 0;
     selection
         .selectAll(Selectors.LegendItem.selectorName)
         .data(settings.legend.show ? data.legend : [])
         .join(
-            enter =>
+            (enter) =>
                 enter
                     .append("g")
                     .classed("legendItem", true)
-                    .each(function(d) {
-                        select(this)
-                            .append("circle")
-                            .classed("legendMarker", true)
-                            .attr("r", 5)
-                            .style("fill", d.color);
+                    .each(function (d) {
+                        select(this).append("circle").classed("legendMarker", true).attr("r", 5).style("fill", d.color);
                         select(this)
                             .append("text")
                             .classed("legendText", true)
@@ -63,11 +64,9 @@ export function drawLegend(selection: Selection<any, any, any, any>, data: Event
                             .style("font-style", settings.legend.FontStyle)
                             .style("font-weight", settings.legend.fontWeight);
                     }),
-            update =>
-                update.classed("hidden", !settings.legend.show).each(function(d) {
-                    select(this)
-                        .selectAll(".legendMarker")
-                        .style("fill", d.color);
+            (update) =>
+                update.classed("hidden", !settings.legend.show).each(function (d) {
+                    select(this).selectAll(".legendMarker").style("fill", d.color);
                     select(this)
                         .selectAll(".legendText")
                         .text(d.legend)
@@ -77,25 +76,25 @@ export function drawLegend(selection: Selection<any, any, any, any>, data: Event
                         .style("font-style", settings.legend.FontStyle)
                         .style("font-weight", settings.legend.fontWeight);
                 }),
-            exit => exit.remove()
+            (exit) => exit.remove()
         );
 
-    selection.selectAll(Selectors.LegendItem.selectorName).each(function() {
+    selection.selectAll(Selectors.LegendItem.selectorName).each(function () {
         const size = (<SVGGElement>this).getBoundingClientRect();
         select(this).attr("transform", `translate(${moveX} 0)`);
         moveX += size.width + 5;
     });
 
-    selection.attr("transform", function(d) {
+    selection.attr("transform", function () {
         const size = (<SVGGElement>this).getBoundingClientRect();
         const centerX = settings.general.width * 0.5;
         switch (settings.legend.position) {
             case LegendPosition.BottomLeft:
                 return `translate(10, ${settings.general.height - size.height})`;
             case LegendPosition.BottomRight:
-                return `translate(${settings.general.width -
-                    size.width -
-                    10}, ${settings.general.height - size.height})`;
+                return `translate(${
+                    settings.general.width - size.width - 10
+                }, ${settings.general.height - size.height})`;
             case LegendPosition.BottomCenter:
                 return `translate(${centerX - size.width / 2}, ${settings.general.height - size.height})`;
             case LegendPosition.TopRight:

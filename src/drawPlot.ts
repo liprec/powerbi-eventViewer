@@ -26,8 +26,7 @@
  */
 
 "use strict";
-import powerbi from "powerbi-visuals-api";
-import { Selection } from "d3-selection";
+import { BaseType, Selection } from "d3-selection";
 
 import { DataPoint, Device, EventDataPoints, State } from "./data";
 import { drawState, getStateColor } from "./drawState";
@@ -35,7 +34,7 @@ import { Selectors } from "./selectors";
 import { Settings } from "./settings";
 
 export function drawPlot(
-    selection: Selection<any, any, any, any>,
+    selection: Selection<BaseType, unknown, BaseType, unknown>,
     data: EventDataPoints,
     settings: Settings,
     clickEvent: (event: MouseEvent, state: State) => void
@@ -44,27 +43,27 @@ export function drawPlot(
         .selectAll(Selectors.Device.selectorName)
         .data(data.devices, (device: Device) => device.key)
         .join(
-            enter => enter.append("g").classed(Selectors.Device.className, true),
-            update => update.select(Selectors.Device.selectorName),
-            exit => exit.remove()
+            (enter) => enter.append("g").classed(Selectors.Device.className, true),
+            (update) => update.select(Selectors.Device.selectorName),
+            (exit) => exit.remove()
         )
         .selectAll(Selectors.States.selectorName)
         .data((device: Device) => device.states)
         .join(
-            enter =>
+            (enter) =>
                 enter
                     .append("path")
                     .classed(Selectors.State.className, true)
                     .attr("d", (state: State) => drawState(<DataPoint>state.dataPoint))
                     .attr("fill", (state: State) => getStateColor(state))
                     .style("opacity", (state: State) => (state.isHighlight ? 1 : 0.3)),
-            update =>
+            (update) =>
                 update
                     .select(Selectors.State.selectorName)
                     .attr("d", (state: State) => drawState(<DataPoint>state.dataPoint))
                     .attr("fill", (state: State) => getStateColor(state))
                     .style("opacity", (state: State) => (state.isHighlight ? 1 : 0.3)),
-            exit => exit.remove()
+            (exit) => exit.remove()
         )
         .on("click", clickEvent);
 }
