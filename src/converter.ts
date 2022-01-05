@@ -126,11 +126,8 @@ function getDevices(
     timeFormatter: valueFormatter.IValueFormatter
 ): Device[] {
     const unknownCorrection = legend.length;
-    return rows.map((row: DataViewMatrixNode, index: number) => {
-        const deviceSelectionId = host
-            .createSelectionIdBuilder()
-            .withMatrixNode(row, rowLevels)
-            .createSelectionId();
+    return rows.map((row: DataViewMatrixNode) => {
+        const deviceSelectionId = host.createSelectionIdBuilder().withMatrixNode(row, rowLevels).createSelectionId();
         const device: Device = <Device>{
             key: -1,
             name: row.value,
@@ -265,13 +262,14 @@ function getColorByIndex(
     colorPalette: ISandboxExtendedColorPalette
 ): string {
     if (objects) {
-        const color: any = getObject(objects, capability);
+        const color = getObject(objects, capability);
         if (color) {
-            const instance: any = color.$instances;
+            const instance = color.$instances;
             if (instance) {
-                const setting: any = instance[index];
+                const setting = instance[index];
                 if (setting) {
-                    return setting.fill.solid.color;
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    return (<any>setting.fill).solid.color;
                 }
             }
         }

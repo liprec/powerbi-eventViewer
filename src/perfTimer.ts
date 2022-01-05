@@ -28,15 +28,15 @@
 "use strict";
 
 export class PerfTimer {
-    public static START(name: string, enabled: boolean = false) {
-        let performance: Performance = window.performance;
-        if (!performance || !performance.mark || !!enabled) return () => {};
+    public static START(name: string, enabled = false) {
+        const performance: Performance = window.performance;
+        if (!performance || !performance.mark || !!enabled) return () => true;
         if (console.time) console.time(name);
-        let startMark: string = name + " start";
+        const startMark: string = name + " start";
         performance.mark(startMark);
         console.log(startMark);
         return () => {
-            let end: string = name + " end";
+            const end: string = name + " end";
             performance.mark(end);
             // NOTE: Chromium supports performance.mark but not performance.measure.
             if (performance.measure) performance.measure(name, startMark, end);
@@ -44,15 +44,15 @@ export class PerfTimer {
         };
     }
 
-    public static LOGTIME(action: any) {
-        // Desktop"s old Chromium doesn"t support use of Performance Markers yet
-        let start: number = Date.now();
-        action();
-        return Date.now() - start;
-    }
+    // public static LOGTIME(action: () => void) {
+    //     // Desktop"s old Chromium doesn"t support use of Performance Markers yet
+    //     const start: number = Date.now();
+    //     action();
+    //     return Date.now() - start;
+    // }
 
-    public static LOGMSG(message: string, enabled: boolean = false) {
-        if (!enabled) return () => {};
-        console.log(message);
-    }
+    // public static LOGMSG(message: string, enabled = false) {
+    //     if (!enabled) return () => void;
+    //     console.log(message);
+    // }
 }

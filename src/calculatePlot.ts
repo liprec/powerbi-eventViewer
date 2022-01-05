@@ -32,7 +32,7 @@ import { max } from "d3";
 
 import measureSvgTextHeight = textMeasurementService.measureSvgTextHeight;
 
-import { Device, EventDataPoints, Legend } from "./data";
+import { EventDataPoints, Legend } from "./data";
 import { Settings } from "./settings";
 import { LegendPosition } from "./enums";
 

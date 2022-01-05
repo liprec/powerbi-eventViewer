@@ -27,7 +27,7 @@
 
 "use strict";
 
-import { DataPoint, Device, EventDataPoints, Scales, State } from "./data";
+import { DataPoint, Device, EventDataPoints, State } from "./data";
 import { Settings } from "./settings";
 
 export function calculateData(data: EventDataPoints, settings: Settings): EventDataPoints {

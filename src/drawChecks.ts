@@ -26,25 +26,25 @@
  */
 
 "use strict";
-import powerbi from "powerbi-visuals-api";
-import { Selection, select } from "d3-selection";
+import { BaseType, Selection, select } from "d3-selection";
 
 import { Selectors } from "./selectors";
 
-export function drawChecks(selection: Selection<any, any, any, any>, checks: any): void {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function drawChecks(selection: Selection<BaseType, unknown, BaseType, unknown>, checks: any): void {
     let moveY = 10;
-    const checkData = Object.keys(checks).map(k => {
+    const checkData = Object.keys(checks).map((k) => {
         return { key: k, value: checks[k] };
     });
     selection
         .selectAll(Selectors.CheckListItem.selectorName)
         .data(checkData)
         .join(
-            enter =>
+            (enter) =>
                 enter
                     .append("g")
                     .classed(Selectors.CheckListItem.className, true)
-                    .each(function(d) {
+                    .each(function (d) {
                         select(this)
                             .append("path")
                             .classed("checkBox", true)
@@ -65,8 +65,8 @@ export function drawChecks(selection: Selection<any, any, any, any>, checks: any
                             .style("alignment-baseline", "baseline")
                             .text(d.key);
                     }),
-            update =>
-                update.each(function(d) {
+            (update) =>
+                update.each(function (d) {
                     select(this)
                         .selectAll(".checkBox")
                         .attr(
@@ -85,14 +85,14 @@ export function drawChecks(selection: Selection<any, any, any, any>, checks: any
                         .style("alignment-baseline", "baseline")
                         .text(d.key);
                 }),
-            exit => exit.remove()
+            (exit) => exit.remove()
         );
 
-    selection.selectAll(Selectors.CheckListItem.selectorName).each(function() {
+    selection.selectAll(Selectors.CheckListItem.selectorName).each(function () {
         const size = (<SVGGElement>this).getBoundingClientRect();
         select(this).attr("transform", `translate(0, ${moveY})`);
         moveY += size.height + 5;
     });
 
-    selection.attr("transform", "translate(10, 40)").classed("hidden", !checkData.some(c => !c.value));
+    selection.attr("transform", "translate(10, 40)").classed("hidden", !checkData.some((c) => !c.value));
 }

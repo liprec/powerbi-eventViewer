@@ -32,7 +32,7 @@ import "./../style/visual.less";
 
 import powerbi from "powerbi-visuals-api";
 import { ITooltipServiceWrapper, createTooltipServiceWrapper } from "powerbi-visuals-utils-tooltiputils";
-import { select, Selection } from "d3-selection";
+import { BaseType, select, Selection } from "d3-selection";
 import { isEqual } from "lodash";
 
 import DataView = powerbi.DataView;
@@ -68,16 +68,16 @@ import { calculateData } from "./calculateData";
 
 export class EventViewer implements IVisual {
     private target: HTMLElement;
-    private border: Selection<any, any, any, any>;
-    private svg: Selection<any, any, any, any>;
-    private plotArea: Selection<any, any, any, any>;
-    private axis: Selection<any, any, any, any>;
-    private checkList: Selection<any, any, any, any>;
-    private devices: Selection<any, any, any, any>;
-    private legendArea: Selection<any, any, any, any>;
-    private legendBorder: Selection<any, any, any, any>;
-    private legend: Selection<any, any, any, any>;
-    private landingPage: Selection<any, any, any, any>;
+    private border: Selection<BaseType, unknown, BaseType, unknown>;
+    private svg: Selection<BaseType, unknown, BaseType, unknown>;
+    private plotArea: Selection<BaseType, unknown, BaseType, unknown>;
+    private axis: Selection<BaseType, unknown, BaseType, unknown>;
+    private checkList: Selection<BaseType, unknown, BaseType, unknown>;
+    private devices: Selection<BaseType, unknown, BaseType, unknown>;
+    private legendArea: Selection<BaseType, unknown, BaseType, unknown>;
+    private legendBorder: Selection<BaseType, unknown, BaseType, unknown>;
+    private legend: Selection<BaseType, unknown, BaseType, unknown>;
+    private landingPage: Selection<BaseType, unknown, BaseType, unknown>;
     private legendTimeoutId?: number;
     private locale: string;
     private data: EventDataPoints;
@@ -94,8 +94,7 @@ export class EventViewer implements IVisual {
     private allowInteractions: boolean;
     private tooltipServiceWrapper: ITooltipServiceWrapper;
     private renderTimeoutId: number | undefined;
-    private colorConfig: any[];
-    private styleConfig: any[];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private checks: any;
 
     constructor(options: VisualConstructorOptions) {
@@ -113,9 +112,7 @@ export class EventViewer implements IVisual {
         this.tooltipServiceWrapper = createTooltipServiceWrapper(options.host.tooltipService, options.element);
         this.colorPalette = options.host.colorPalette;
         this.target = options.element;
-        this.border = select(options.element)
-            .append("div")
-            .classed("border", true);
+        this.border = select(options.element).append("div").classed("border", true);
         this.svg = this.border.append("svg").classed(Selectors.Svg.className, true);
         this.svg.on("click", () => {
             if (this.allowInteractions) {
@@ -143,10 +140,7 @@ export class EventViewer implements IVisual {
         this.legendArea = this.svg.append("g").classed(Selectors.LegendArea.className, true);
         this.legendBorder = this.legendArea.append("rect").classed(Selectors.LegendBorder.className, true);
         this.legend = this.legendArea.append("g").classed(Selectors.Legend.className, true);
-        this.devices = this.plotArea
-            .append("g")
-            .classed(Selectors.Devices.className, true)
-            .attr("fill", "none");
+        this.devices = this.plotArea.append("g").classed(Selectors.Devices.className, true).attr("fill", "none");
         this.axis.append("g").classed(Selectors.deviceAxis.className, true);
         this.axis.append("g").classed(Selectors.timeAxis.className, true);
         this.events = options.host.eventService;
@@ -191,10 +185,7 @@ export class EventViewer implements IVisual {
                     "Provided field for the 'Time' does not contain date/time values"
                 );
             this.devices.selectAll("*").remove();
-            this.axis
-                .selectAll("*")
-                .selectAll("*")
-                .remove();
+            this.axis.selectAll("*").selectAll("*").remove();
             this.legend.selectAll("*").remove();
             this.events.renderingFinished(options);
             timer();
@@ -268,7 +259,7 @@ export class EventViewer implements IVisual {
     }
 
     public stateColorEnumerateObjectInstances(states: Legend[] | undefined): VisualObjectInstance[] {
-        let instances: VisualObjectInstance[] = [];
+        const instances: VisualObjectInstance[] = [];
         states?.forEach((state: Legend, index: number) => {
             instances.push({
                 displayName: state.legend,
@@ -295,8 +286,10 @@ export class EventViewer implements IVisual {
 
     public removeEnumerateObject(instanceEnumeration: VisualObjectInstanceEnumeration, objectName: string): void {
         if ((<VisualObjectInstanceEnumerationObject>instanceEnumeration).instances) {
+            // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
             delete (<VisualObjectInstanceEnumerationObject>instanceEnumeration).instances[0].properties[objectName];
         } else {
+            // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
             delete (<VisualObjectInstance[]>instanceEnumeration)[0].properties[objectName];
         }
     }

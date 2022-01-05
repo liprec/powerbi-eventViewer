@@ -1,0 +1,96 @@
+{
+    "env": {
+        "browser": true,
+        "es6": true
+    },
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "project": "tsconfig.json",
+        "sourceType": "module"
+    },
+    "plugins": ["eslint-plugin-security", "eslint-plugin-lodash", "@typescript-eslint", "@typescript-eslint/tslint"],
+    "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:prettier/recommended",
+        "prettier"
+    ],
+    "rules": {
+        "@typescript-eslint/no-array-constructor": "error",
+        "@typescript-eslint/no-dynamic-delete": "error",
+        "lodash/chaining": ["error", "never"],
+        "max-statements": ["error", 100],
+        "no-array-constructor": "error",
+        "no-caller": "error",
+        "no-constant-condition": "error",
+        "no-control-regex": "error",
+        "no-eval": "error",
+        "no-extra-semi": "error",
+        "no-invalid-regexp": "error",
+        "no-octal": "error",
+        "no-octal-escape": "error",
+        "no-regex-spaces": "error",
+        "no-restricted-syntax": [
+            "error",
+            {
+                "message": "Forbidden call to document.cookie",
+                "selector": "MemberExpression[object.name=\"document\"][property.name=\"cookie\"]"
+            }
+        ],
+        "no-warning-comments": [
+            "error",
+            {
+                "location": "anywhere",
+                "terms": ["BUG", "HACK", "FIXME", "LATER", "LATER2", "TODO"]
+            }
+        ],
+        "no-with": "error",
+        "security/detect-non-literal-fs-filename": "error",
+        "security/detect-non-literal-require": "error",
+        "security/detect-possible-timing-attacks": "error",
+        "@typescript-eslint/tslint/config": [
+            "error",
+            {
+                "rules": {
+                    "chai-prefer-contains-to-index-of": true,
+                    "chai-vague-errors": true,
+                    "export-name": true,
+                    "function-name": true,
+                    "import-name": true,
+                    "informative-docs": true,
+                    "insecure-random": true,
+                    "jquery-deferred-must-complete": true,
+                    "mocha-no-side-effect-code": true,
+                    "mocha-unneeded-done": true,
+                    "no-backbone-get-set-outside-model": true,
+                    "no-disable-auto-sanitization": true,
+                    "no-http-string": [true, "http://www.example.com/?.*", "http://localhost:?.*"],
+                    "no-inner-html": true,
+                    "no-jquery-raw-elements": true,
+                    "no-single-line-block-comment": true,
+                    "no-string-based-set-immediate": true,
+                    "no-string-based-set-interval": true,
+                    "no-string-based-set-timeout": true,
+                    "no-typeof-undefined": true,
+                    "no-unnecessary-local-variable": true,
+                    "no-unnecessary-override": true,
+                    "no-unsupported-browser-code": true,
+                    "no-useless-files": true,
+                    "prefer-type-cast": true,
+                    "promise-must-complete": true,
+                    "react-a11y-accessible-headings": true,
+                    "react-a11y-input-elements": true,
+                    "react-a11y-meta": true,
+                    "react-a11y-required": true,
+                    "react-a11y-titles": true,
+                    "react-anchor-blank-noopener": true,
+                    "react-iframe-missing-sandbox": true,
+                    "react-this-binding-issue": true,
+                    "use-named-parameter": true,
+                    "use-simple-attributes": true
+                },
+                "rulesDirectory": ["./node_modules/tslint-microsoft-contrib"]
+            }
+        ]
+    }
+}
