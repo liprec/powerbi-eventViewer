@@ -7,7 +7,8 @@
         "package": "pbiviz package --resources",
         "pretest": "npm install && pbiviz package --resources --no-minify --no-pbiviz --no-plugin",
         "test:lint": "eslint -c .eslintrc.json --ext .ts ./src",
-        "test": "npm run test:lint"
+        "lint": "tslint -c tslint.json -p tsconfig.json",
+        "test": "npm run test:lint && npm run lint"
     },
     "dependencies": {
         "core-js": "^3.20.2",
