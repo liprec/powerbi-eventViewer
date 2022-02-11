@@ -3,7 +3,7 @@
     "scripts": {
         "pbiviz": "pbiviz",
         "start": "pbiviz start",
-        "prepackage": "npm install --production",
+        "prepackage": "npm install",
         "package": "pbiviz package --resources",
         "pretest": "npm install && pbiviz package --resources --no-minify --no-pbiviz --no-plugin",
         "test:lint": "eslint -c .eslintrc.json --ext .ts ./src",
