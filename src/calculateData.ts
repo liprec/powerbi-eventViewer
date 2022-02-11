@@ -51,9 +51,16 @@ export function calculateData(data: EventDataPoints, settings: Settings): EventD
                     <number>state.dataPoint?.x2 +
                     <number>state.dataPoint?.y1 +
                     <number>state.dataPoint?.y2 +
-                    (state.isHighlight ? index + 1 : 0)
+                    (state.isHighlight ? index + 1 : 0) +
+                    hexToColorInt(state.color)
             )
             .reduce((a, b) => a + b);
     });
     return data;
+}
+
+function hexToColorInt(rrggbb: string): number {
+    const offset = rrggbb.charAt(0) === "#" ? 1 : 0;
+    const bbggrr = rrggbb.substring(4 + offset, 2) + rrggbb.substring(2 + offset, 2) + rrggbb.substring(0 + offset, 2);
+    return parseInt(bbggrr, 16);
 }

@@ -82,6 +82,11 @@ export interface Legend {
     color: string;
 }
 
+export interface LookupColor {
+    name: string;
+    color: string;
+}
+
 export interface Scales {
     timeScale: ScaleTime<number, number, never>;
     deviceScale: ScaleBand<string>;

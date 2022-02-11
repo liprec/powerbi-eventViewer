@@ -167,6 +167,8 @@ class TimeAxis {
 
 class StateColorSettings {
     public fill = "#EEEEEE";
+    public persist = false;
+    public colorConfig = "[]";
 }
 
 class UnknownSettings {
