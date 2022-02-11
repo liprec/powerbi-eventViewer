@@ -4,7 +4,7 @@
         "displayName": "Event Viewer Chart",
         "guid": "eventViewer0D4E4EFE0AEC4A0A9CB3C14B04685C64",
         "visualClassName": "EventViewer",
-        "version": "1.0.8",
+        "version": "1.1.0",
         "description": "Visualize device events in the time",
         "supportUrl": "https://azurebi-docs.jppp.org/powerbi-visuals/index.html",
         "gitHubUrl": "https://github.com/liprec/powerbi-eventViewer"

@@ -36,6 +36,7 @@ import { BaseType, select, Selection } from "d3-selection";
 import { isEqual } from "lodash";
 
 import DataView = powerbi.DataView;
+import Selector = powerbi.data.Selector;
 import EnumerateVisualObjectInstancesOptions = powerbi.EnumerateVisualObjectInstancesOptions;
 import ISandboxExtendedColorPalette = powerbi.extensibility.ISandboxExtendedColorPalette;
 import ISelectionId = powerbi.visuals.ISelectionId;
@@ -81,6 +82,7 @@ export class EventViewer implements IVisual {
     private legendTimeoutId?: number;
     private locale: string;
     private data: EventDataPoints;
+    private colorConfig: unknown[];
     private events: IVisualEventService;
     private isLandingPageOn: boolean;
     private landingPageRemoved: boolean;
@@ -198,6 +200,22 @@ export class EventViewer implements IVisual {
         this.settings = calculateScale(this.data, this.settings);
         this.data = calculateData(this.data, this.settings);
 
+        if (this.settings.stateColor.persist) {
+            this.settings.stateColor.persist = false;
+            this.host.persistProperties({
+                merge: [
+                    {
+                        objectName: "stateColor",
+                        selector: <Selector>(<unknown>null),
+                        properties: {
+                            persist: false,
+                            colorConfig: this.settings.stateColor.colorConfig,
+                        },
+                    },
+                ],
+            });
+        }
+
         drawAxis(this.axis, this.data, this.settings, (event: MouseEvent, deviceName: string) => {
             const currentDevice = this.data.devices.filter((device: Device) => device.name === deviceName);
             if (currentDevice.length === 0 || !currentDevice[0].selectionId) return;
@@ -242,18 +260,24 @@ export class EventViewer implements IVisual {
         );
 
         let instances: VisualObjectInstance[] = [];
+        let beginning = false;
 
         switch (options.objectName) {
             case "general":
                 return [];
             case "stateColor":
                 this.removeEnumerateObject(instanceEnumeration, "fill");
+                if (this.settings.stateColor.colorConfig === "[]") {
+                    this.removeEnumerateObject(instanceEnumeration, "colorConfig");
+                    //instances = this.stateColorEnumerateObjectInstances(this.data.legend);
+                } //else this.removeEnumerateObject(instanceEnumeration, "persist");
                 instances = this.stateColorEnumerateObjectInstances(this.data.legend);
+                beginning = true;
                 break;
         }
 
         instances.forEach((instance: VisualObjectInstance) => {
-            this.addAnInstanceToEnumeration(instanceEnumeration, instance);
+            this.addAnInstanceToEnumeration(instanceEnumeration, instance, beginning);
         });
         return instanceEnumeration;
     }
@@ -275,12 +299,17 @@ export class EventViewer implements IVisual {
 
     public addAnInstanceToEnumeration(
         instanceEnumeration: VisualObjectInstanceEnumeration,
-        instance: VisualObjectInstance
+        instance: VisualObjectInstance,
+        beginning = false
     ): void {
         if ((<VisualObjectInstanceEnumerationObject>instanceEnumeration).instances) {
-            (<VisualObjectInstanceEnumerationObject>instanceEnumeration).instances.push(instance);
+            beginning
+                ? (<VisualObjectInstanceEnumerationObject>instanceEnumeration).instances.unshift(instance)
+                : (<VisualObjectInstanceEnumerationObject>instanceEnumeration).instances.push(instance);
         } else {
-            (<VisualObjectInstance[]>instanceEnumeration).push(instance);
+            beginning
+                ? (<VisualObjectInstance[]>instanceEnumeration).unshift(instance)
+                : (<VisualObjectInstance[]>instanceEnumeration).push(instance);
         }
     }
 

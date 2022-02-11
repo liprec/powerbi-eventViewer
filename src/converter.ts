@@ -43,7 +43,7 @@ import { Checks, Roles, TraceEvents } from "./enums";
 import { PerfTimer } from "./perfTimer";
 import { valueFormatter } from "powerbi-visuals-utils-formattingutils";
 import { parseSettings, Settings } from "./settings";
-import { Device, State, EventDataPoints, Legend } from "./data";
+import { Device, State, EventDataPoints, Legend, LookupColor } from "./data";
 import { max, min } from "d3";
 
 export function converter(
@@ -100,7 +100,23 @@ export function converter(
     if (settings.timeAxis.lagTime !== null)
         eTime.setSeconds(eTime.getSeconds() + settings.timeAxis.lagTime * settings.timeAxis.lagTimePrecision);
 
-    updateDeviceStates(devices, settings, sTime, eTime, timeFormatter, timeSeries);
+    if (settings.stateColor.persist) {
+        settings.stateColor.colorConfig = JSON.stringify(
+            legend.map((legend: Legend) => {
+                return {
+                    name: legend.legend,
+                    color: legend.color,
+                };
+            })
+        );
+    } else {
+        settings.stateColor.colorConfig =
+            settings.stateColor.colorConfig === "" ? "[]" : settings.stateColor.colorConfig;
+    }
+
+    const colorList: LookupColor[] = JSON.parse(settings.stateColor.colorConfig);
+    updateDeviceStates(devices, settings, colorList, sTime, eTime, timeFormatter, timeSeries);
+    updateLegendColors(legend, colorList);
 
     settings.general.width = viewPort.width - 2 * settings.general.padding;
     settings.general.height = viewPort.height - 2 * settings.general.padding;
@@ -180,6 +196,7 @@ function getDevices(
 function updateDeviceStates(
     devices: Device[],
     settings: Settings,
+    colorList: LookupColor[],
     sTime: Date,
     eTime: Date,
     timeFormatter: valueFormatter.IValueFormatter,
@@ -204,11 +221,21 @@ function updateDeviceStates(
         }
         const nrOfEvents = device.states.length;
         device.states.forEach((state: State, index: number, all: State[]) => {
+            const lookupColor = colorList.filter((coloritem) => coloritem.name === state.state);
+            if (lookupColor.length > 0) state.color = lookupColor[0].color;
             if (index < nrOfEvents - 1) state.endTime = all[index + 1].time;
             else state.endTime = eTime; //max(timeSeries);
             if (state.time < sTime) state.time = sTime;
         });
         device.states = device.states.filter((state: State) => <Date>state.endTime > sTime);
+    });
+}
+
+function updateLegendColors(legend: Legend[], colorList: LookupColor[]) {
+    if (colorList.length === 0) return;
+    legend.forEach((legend: Legend) => {
+        const lookupColor = colorList.filter((coloritem) => coloritem.name === legend.legend);
+        if (lookupColor.length > 0) legend.color = lookupColor[0].color;
     });
 }
 

@@ -3,7 +3,7 @@
     "scripts": {
         "pbiviz": "pbiviz",
         "start": "pbiviz start",
-        "prepackage": "npm install",
+        "prepackage": "npm install --production",
         "package": "pbiviz package --resources",
         "pretest": "npm install && pbiviz package --resources --no-minify --no-pbiviz --no-plugin",
         "test:lint": "eslint -c .eslintrc.json --ext .ts ./src",
@@ -11,7 +11,7 @@
         "test": "npm run test:lint && npm run lint"
     },
     "dependencies": {
-        "core-js": "^3.20.3",
+        "core-js": "^3.21.0",
         "d3": "^6.6.0",
         "lodash": "^4.17.21",
         "powerbi-models": "^1.9.8",

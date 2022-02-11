@@ -65,7 +65,7 @@ jobs:
             Visualize device events in the time
 
             ## Availability
-            The final version is available at AppSource:
+            The final version is available at AppSource: https://appsource.microsoft.com/en-us/product/power-bi-visuals/janpieterposthuma1781555020.eventviewer
       - name: upload Release Asset
         uses: actions/upload-release-asset@v1
         env:

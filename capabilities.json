@@ -375,6 +375,20 @@
                             }
                         }
                     }
+                },
+                "persist": {
+                    "displayName": "Persist formatting",
+                    "description": "Stores the current color config",
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "colorConfig": {
+                    "displayName": "Colors",
+                    "description": "JSON Array with prefix link colors: [{name, color}]",
+                    "type": {
+                        "text": true
+                    }
                 }
             }
         },
