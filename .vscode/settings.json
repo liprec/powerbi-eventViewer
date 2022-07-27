@@ -32,19 +32,22 @@
             "url": "./node_modules/powerbi-visuals-api/schema.dependencies.json"
         }
     ],
-    "cSpell.words": ["tooltips"],
-    "workbench.colorCustomizations": {
-        "titleBar.activeBackground": "#f2c811",
-        "titleBar.inactiveBackground": "#f2c81199",
-        "titleBar.activeForeground": "#15202b",
-        "titleBar.inactiveForeground": "#15202b99",
-        "statusBar.background": "#f2c811",
-        "statusBarItem.hoverBackground": "#c5a20b",
-        "statusBar.foreground": "#15202b",
-        "sash.hoverBorder": "#f5d341",
-        "statusBarItem.remoteBackground": "#f2c811",
-        "statusBarItem.remoteForeground": "#15202b"
-    },
+    "cSpell.words": [
+        "tooltips"
+    ],
     "peacock.color": "#f2c811",
-    "peacock.affectActivityBar": false
+    "peacock.affectActivityBar": false,
+    "workbench.colorCustomizations": {
+        "sash.hoverBorder": "#f5d341",
+        "statusBar.background": "#f2c811",
+        "statusBar.foreground": "#15202b",
+        "statusBarItem.hoverBackground": "#c5a20b",
+        "statusBarItem.remoteBackground": "#f2c811",
+        "statusBarItem.remoteForeground": "#15202b",
+        "titleBar.activeBackground": "#f2c811",
+        "titleBar.activeForeground": "#15202b",
+        "titleBar.inactiveBackground": "#f2c81199",
+        "titleBar.inactiveForeground": "#15202b99"
+    },
+    "peacock.remoteColor": "#f2c811"
 }
