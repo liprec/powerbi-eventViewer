@@ -92,6 +92,9 @@ export function converter(
     }
     const devices: Device[] = getDevices(rows, host, rowLevels, timeSeries, legend, dataView, colors, timeFormatter);
 
+    // in case there is only one event, we need to add an different endTime (+1s) for that event to show the chart
+    if (timeSeries.length === 1) timeSeries.push(new Date(timeSeries[0].getTime() + 1));
+
     const sTime = new Date(JSON.parse(JSON.stringify(<Date>min(timeSeries))));
     const eTime = new Date(JSON.parse(JSON.stringify(<Date>max(timeSeries))));
 
@@ -154,7 +157,7 @@ function getDevices(
             device.states = row.children.map((measure: DataViewMatrixNode) => {
                 const time = new Date(<string>measure.value);
                 if (!timeSeries.some((t: Date) => t === time)) timeSeries.push(time);
-                const state = measure.values && measure.values[0].value;
+                const state = measure.values && measure.values[0].value?.toString();
                 const isHighlight = measure.values && measure.values[0].highlight !== null;
                 if (!legend.some((s: Legend) => s.legend === state)) {
                     legend.push({
