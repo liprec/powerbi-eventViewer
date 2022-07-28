@@ -27,6 +27,7 @@
 
 "use strict";
 import { BaseType, Selection, select } from "d3-selection";
+import { Checks } from "./enums";
 
 import { Selectors } from "./selectors";
 
@@ -51,8 +52,16 @@ export function drawChecks(selection: Selection<BaseType, unknown, BaseType, unk
                             .attr(
                                 "d",
                                 d.value
-                                    ? "M14 0h-12c-1.1 0-2 .9-2 2v12c0 1.1 .9 2 2 2h12c1.1 0 2-.9 2-2v-12c0-1.1-.9-2-2-2zM7 12.4l-3.7-3.7 1.4-1.4 2.3 2.3 4.8-4.8 1.4 1.4-6.2 6.2z"
-                                    : "M14 0h-12c-1.1 0-2 .9-2 2v12c0 1.1 .9 2 2 2h12c1.1 0 2-.9 2-2v-12c0-1.1-.9-2-2-2zM14 14h-12v-12h12v12z"
+                                    ? `M${
+                                          d.key === Checks.ValidTime ? 34 : 14
+                                      } 0h-12c-1.1 0-2 .9-2 2v12c0 1.1 .9 2 2 2h12c1.1 0 2-.9 2-2v-12c0-1.1-.9-2-2-2zM${
+                                          d.key === Checks.ValidTime ? 27 : 7
+                                      } 12.4l-3.7-3.7 1.4-1.4 2.3 2.3 4.8-4.8 1.4 1.4-6.2 6.2z`
+                                    : `M${
+                                          d.key === Checks.ValidTime ? 34 : 14
+                                      } 0h-12c-1.1 0-2 .9-2 2v12c0 1.1 .9 2 2 2h12c1.1 0 2-.9 2-2v-12c0-1.1-.9-2-2-2zM${
+                                          d.key === Checks.ValidTime ? 34 : 14
+                                      } 14h-12v-12h12v12z`
                             )
                             .style("stroke", "black")
                             .style("stroke-with", "1px");
@@ -60,7 +69,7 @@ export function drawChecks(selection: Selection<BaseType, unknown, BaseType, unk
                         select(this)
                             .append("text")
                             .classed("checkText", true)
-                            .attr("x", 25)
+                            .attr("x", d.key === Checks.ValidTime ? 45 : 25)
                             .attr("y", ".8em")
                             .style("alignment-baseline", "baseline")
                             .text(d.key);
@@ -72,15 +81,23 @@ export function drawChecks(selection: Selection<BaseType, unknown, BaseType, unk
                         .attr(
                             "d",
                             d.value
-                                ? "M14 0h-12c-1.1 0-2 .9-2 2v12c0 1.1 .9 2 2 2h12c1.1 0 2-.9 2-2v-12c0-1.1-.9-2-2-2zM7 12.4l-3.7-3.7 1.4-1.4 2.3 2.3 4.8-4.8 1.4 1.4-6.2 6.2z"
-                                : "M14 0h-12c-1.1 0-2 .9-2 2v12c0 1.1 .9 2 2 2h12c1.1 0 2-.9 2-2v-12c0-1.1-.9-2-2-2zM14 14h-12v-12h12v12z"
+                                ? `M${
+                                      d.key === Checks.ValidTime ? 34 : 14
+                                  } 0h-12c-1.1 0-2 .9-2 2v12c0 1.1 .9 2 2 2h12c1.1 0 2-.9 2-2v-12c0-1.1-.9-2-2-2zM${
+                                      d.key === Checks.ValidTime ? 27 : 7
+                                  } 12.4l-3.7-3.7 1.4-1.4 2.3 2.3 4.8-4.8 1.4 1.4-6.2 6.2z`
+                                : `M${
+                                      d.key === Checks.ValidTime ? 34 : 14
+                                  } 0h-12c-1.1 0-2 .9-2 2v12c0 1.1 .9 2 2 2h12c1.1 0 2-.9 2-2v-12c0-1.1-.9-2-2-2zM${
+                                      d.key === Checks.ValidTime ? 34 : 14
+                                  } 14h-12v-12h12v12z`
                         )
                         .style("stroke", "black")
                         .style("stroke-with", "1px");
 
                     select(this)
                         .selectAll(".checkText")
-                        .attr("x", 25)
+                        .attr("x", d.key === Checks.ValidTime ? 45 : 25)
                         .attr("y", ".8em")
                         .style("alignment-baseline", "baseline")
                         .text(d.key);
