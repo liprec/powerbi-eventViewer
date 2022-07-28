@@ -157,7 +157,7 @@ function getDevices(
             device.states = row.children.map((measure: DataViewMatrixNode) => {
                 const time = new Date(<string>measure.value);
                 if (!timeSeries.some((t: Date) => t === time)) timeSeries.push(time);
-                const state = measure.values && measure.values[0].value;
+                const state = measure.values && measure.values[0].value?.toString();
                 const isHighlight = measure.values && measure.values[0].highlight !== null;
                 if (!legend.some((s: Legend) => s.legend === state)) {
                     legend.push({
